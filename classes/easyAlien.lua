@@ -24,26 +24,22 @@ EasyAlien.static.movements[1] = function(self, dt)
    self.y = self.y + math.sin(self.overallTime * 10)
 end
 EasyAlien.static.movements[2] = function(self, dt)
-   --[[local maxTime = 1
-   local superMovement = 40
-   
-   if self.overallTime > maxTime then
-      if self.y + superMovement * self.yDirection > windowHeight - self.height then
-         self.yDirection = -self.yDirection
-      elseif self.y + superMovement * self.yDirection < 0 then
-         self.yDirection = -self.yDirection
-      end
-      
-      self.y = self.y + superMovement * self.yDirection
-      self.overallTime = 0
-   end]]
-   
+   local prevY = self.y
    self.x = self.x + math.sin(self.overallTime * 10) - MOVEMENT
-   self.y = self.y + math.cos(self.overallTime * 10)
+   self.y = self.y + math.cos(self.overallTime * 10) + MOVEMENT * self.yDirection
+   
+   if self.y > windowHeight - self.height * self.scale or self.y < 0 then
+      self.yDirection = -self.yDirection
+      self.y = self.y + math.cos(self.overallTime * 10) + MOVEMENT * self.yDirection
+   end
 end
 EasyAlien.static.movements[3] = function(self, dt)
    self.x = self.x - math.cos(self.overallTime / 10) - MOVEMENT
    self.y = self.y - math.cos(self.overallTime * 10)
+end
+EasyAlien.static.movements[4] = function(self, dt)
+   self.x = self.x + math.sin(self.overallTime * 10) - MOVEMENT
+   self.y = self.y + math.cos(self.overallTime * 10)
 end
 
 function EasyAlien:initialize()
@@ -54,8 +50,9 @@ function EasyAlien:initialize()
    Alien.initialize(self, "Easy", EasyAlien.images[imageIndex], x, y, 8, 8, EasyAlien.imageSpeeds[imageIndex])
    
    self.laserImage = EasyAlien.laserImages[randomGenerator:random(1,3)]
+   self.bulletSpeed = MOVEMENT - 1
    
-   self.maxBulletTime = randomGenerator:random(2,10) * .1
+   self.maxBulletTime = randomGenerator:random(10,25) * .1
    self.bulletTime = randomGenerator:random(self.maxBulletTime / .1) * .1
    self.movementFunction = EasyAlien.movements[randomGenerator:random(1, table.getn(EasyAlien.movements))]
    
@@ -68,6 +65,7 @@ function EasyAlien:update(dt)
    Alien.update(self, dt)
    self.overallTime = self.overallTime + dt
    self.movementFunction(self, dt)
+   self.bulletTime = self.bulletTime + dt
    
    if self.x < -self.width * self.scale then
       self.marked = true
@@ -75,5 +73,10 @@ function EasyAlien:update(dt)
    
    if self.y < -self.height * self.scale or self.y > windowHeight then
       self.marked = true
+   end
+   
+   if self.bulletTime > self.maxBulletTime then
+      self.bulletTime = 0
+      self.wantBullet = true
    end
 end

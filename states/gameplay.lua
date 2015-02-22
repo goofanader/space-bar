@@ -80,10 +80,13 @@ function Gameplay:update(dt)
    
    -- update the enemies
    for i = self.enemyCounterBase, self.enemyCounter do
-      if self.enemyList[i] then
-         self.enemyList[i]:update(dt)
+      local enemy = self.enemyList[i]
+      
+      if enemy then
+         enemy:update(dt)
          
-         if self.enemyList[i].marked then
+         -- remove enemy if marked
+         if enemy.marked then
             self.enemyList[i] = nil
             
             if i == self.enemyCounterBase then
@@ -92,6 +95,13 @@ function Gameplay:update(dt)
                   self.enemyCounterBase = self.enemyCounterBase + 1
                end
             end
+         end
+         
+         -- shoot a bullet if requested
+         if enemy.wantBullet then
+            self.bulletList[self.bulletCounter] = Bullet:new(enemy.x - enemy.laserImage:getWidth(), enemy.y + (enemy.width / 2 * enemy.scale) - (enemy.laserImage:getHeight() / 2), 0, 0, enemy.name, -1, self.bulletCounter, enemy.laserImage, enemy.bulletSpeed)
+            enemy.wantBullet = false
+            self.bulletCounter = self.bulletCounter + 1
          end
       end
    end
@@ -102,17 +112,17 @@ function Gameplay:update(dt)
    local enemyTime = randomGenerator:random(7,15) * .1
    
    self.enemyOverallTime = self.enemyOverallTime + dt
-   if randomGenerator:random(1,10) > enemyChance and self:getEnemyCount() < maxEnemies and self.enemyOverallTime > enemyTime then
+   if randomGenerator:random(1,10) > enemyChance and self:getItemCount(self.enemyList, self.enemyCounterBase, self.enemyCounter) < maxEnemies and self.enemyOverallTime > enemyTime then
       self.enemyList[self.enemyCounter] = EasyAlien:new()
       self.enemyCounter = self.enemyCounter + 1
       self.enemyOverallTime = 0
    end
 end
 
-function Gameplay:getEnemyCount()
+function Gameplay:getItemCount(theTable, base, max)
    local ret = 0
-   for i = self.enemyCounterBase, self.enemyCounter do
-      if self.enemyList[i] then
+   for i = base, max do
+      if theTable[i] then
          ret = ret + 1
       end
    end

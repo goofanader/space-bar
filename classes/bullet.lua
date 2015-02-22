@@ -22,10 +22,10 @@ function Bullet:initialize(x, y, worldX, worldY, owner, direction, index, image,
 end
 
 function Bullet:update(dt)
-   self.x = self.x + self.movement * self.direction
+   self.x = self.x + (self.movement * self.direction)
    self.worldX = self.worldX + self.movement * self.direction
    
-   if self.x < 0 - self.image:getWidth() or self.x > windowWidth then
+   if self.x < -self.image:getWidth() or self.x > windowWidth then
       --removeFromBulletList(self.index)
       self.marked = true
    end
