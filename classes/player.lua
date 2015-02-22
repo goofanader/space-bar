@@ -20,6 +20,7 @@ function Player:initialize()
    
    self.timeTotal = 0
    self.bulletTime = BULLET_TIME + 1
+   self.wantBullet = false
 end
 
 function Player:draw()
@@ -49,7 +50,8 @@ function Player:update(dt)
    
    if love.keyboard.isDown(" ") and self.bulletTime > BULLET_TIME then
       -- pew pew lasers
-      addToBulletList(self.x + self.image:getWidth(), self.y, self.worldX + self.image:getWidth(), self.worldY, "Player", 1)
+      --[[addToBulletList(self.x + self.image:getWidth(), self.y, self.worldX + self.image:getWidth(), self.worldY, "Player", 1)]]
+      self.wantBullet = true
       self.bulletTime = 0
    end
    

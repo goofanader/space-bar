@@ -14,8 +14,10 @@ function Bullet:initialize(x, y, worldX, worldY, owner, direction, index)
    self.direction = direction
    
    self.index = index
-   self.image = bulletImage
+   self.image = Bullet.static.image
    self.movement = MOVEMENT + 5
+   
+   self.marked = false -- marked for removement
 end
 
 function Bullet:update(dt)
@@ -23,12 +25,15 @@ function Bullet:update(dt)
    self.worldX = self.worldX + self.movement * self.direction
    
    if self.x < 0 - self.image:getWidth() or self.x > windowWidth then
-      removeFromBulletList(self.index)
+      --removeFromBulletList(self.index)
+      self.marked = true
    end
 end
 
 function Bullet:draw()
-   love.graphics.draw(self.image, self.x, self.y, 0, SCALE)
+   if not self.marked then
+      love.graphics.draw(self.image, self.x, self.y, 0, SCALE)
+   end
 end
 
 function Bullet:__tostring()
