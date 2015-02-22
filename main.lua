@@ -1,34 +1,36 @@
-require("classes/additionalFunctions")
+require("libraries/additionalFunctions")
 local sharecart = require("sharecart")
+require("constants")
 
-function love.load()
-   --[[-- load the o_o.ini file
+function createSaveFile()
    local userDirectory = love.filesystem.getWorkingDirectory()
-   --print(userDirectory)
    local directorySplit = split(userDirectory, "/")
-   iniFileObject = nil
-   iniFileString = directorySplit[1]
+   local iniFileObject = nil
+   local iniFileString = directorySplit[1]
+   local slashes = "/"
+   
+   local osname = nil
+   -- the following tidbit of code for finding the os was taken from http://www.wellho.net/resources/ex.php4?item=u112/getos --
+   local fh, err = io.popen("uname -o 2>/dev/null", "r")
+   if fh then
+      osname = fh:read()
+   end
+   
+   if not osname then
+      slashes = "\\"
+   end
    
    for i = 2, table.getn(directorySplit) - 1 do
-      iniFileString = iniFileString .. "/" .. directorySplit[i]
+      iniFileString = iniFileString .. slashes .. directorySplit[i]
    end
    
    print("iniFileString: " .. iniFileString)
+   os.execute("mkdir " .. iniFileString .. slashes .. "dat")
    
-   if not love.filesystem.exists(iniFileString .. "/dat/o_o.ini") then
-      print("woooaahh")
-      if not love.filesystem.exists(iniFileString .. "/dat") then
-         print("aw yeah")
-         if not love.filesystem.createDirectory(iniFileString .. "/dat") then
-            print("couldn't create 'dat' folder!")
-            love.event.quit()
-         end
-      end
+   iniFileObject = io.open(iniFileString .. slashes .. "dat" .. slashes .."o_o.ini", "w")
    
-      iniFileObject = love.filesystem.newFile(iniFileString .. "/dat/o_o.ini")
-      iniFileObject:open("w")
-      
-      -- write a new o_o.ini file! --
+   -- write a new o_o.ini file! --
+   if iniFileObject then
       iniFileObject:write("[Main]\n")
       iniFileObject:write("MapX=0\n")
       iniFileObject:write("MapY=0\n")
@@ -42,53 +44,36 @@ function love.load()
          iniFileObject:write("Switch" .. i .. "=True\n")
       end
       iniFileObject:close()
+   else
+      print("Could not create file!")
+      love.event.quit()
    end
+end
+
+function love.load()
+   love.graphics.setDefaultFilter("nearest")
+   windowWidth, windowHeight = love.graphics.getDimensions()
    
-   iniFileObject = love.filesystem.newFile(iniFileString .. "/dat/o_o.ini")
-   iniFileObject:open("r")
+   require("classes/player")
    
-   print(iniFileString)]]
    local sharecartData = sharecart.love_load(love, args)
    if sharecartData == nil then
       print("ini file not found")
+      createSaveFile()
       
-      
-      local userDirectory = love.filesystem.getWorkingDirectory()
-      --print(userDirectory)
-      local directorySplit = split(userDirectory, "/")
-      iniFileObject = nil
-      iniFileString = directorySplit[1]
-      
-      for i = 2, table.getn(directorySplit) - 1 do
-         iniFileString = iniFileString .. "\\" .. directorySplit[i]
-      end
-      
-      print("iniFileString: " .. iniFileString)
-      os.execute("mkdir " .. iniFileString .. "\\dat")
-      
-      iniFileObject = io.open(iniFileString .. "\\dat\\o_o.ini", "w")
-      
-      -- write a new o_o.ini file! --
-      iniFileObject:write("[Main]\n")
-      iniFileObject:write("MapX=0\n")
-      iniFileObject:write("MapY=0\n")
-      iniFileObject:write("Misc0=0\n")
-      iniFileObject:write("Misc1=0\n")
-      iniFileObject:write("Misc2=0\n")
-      iniFileObject:write("Misc3=0\n")
-      iniFileObject:write("PlayerName=Player\n")
-      
-      for i = 0, 7 do
-         iniFileObject:write("Switch" .. i .. "=True\n")
-      end
-      iniFileObject:close()
+      -- reload the data
+      --sharecartData = sharecart.love_load(love, args)
    end
+   
+   player = Player:new()
 end
 
 function love.update(dt)
+   player:update(dt)
 end
 
 function love.draw()
+   player:draw()
 end
 
 function love.keypressed(key, isrepeat)
