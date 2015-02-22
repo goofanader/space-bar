@@ -4,7 +4,7 @@ require("middleclass-commons")
 Bullet = class("Bullet")
 Bullet.static.image = love.graphics.newImage("images/lazr.png")
 
-function Bullet:initialize(x, y, worldX, worldY, owner, direction, index)
+function Bullet:initialize(x, y, worldX, worldY, owner, direction, index, image, movementSpeed, movementAcceleration)
    self.x = x
    self.y = y
    self.worldX = worldX
@@ -14,8 +14,9 @@ function Bullet:initialize(x, y, worldX, worldY, owner, direction, index)
    self.direction = direction
    
    self.index = index
-   self.image = Bullet.static.image
-   self.movement = MOVEMENT + 5
+   self.image = not image and Bullet.static.image or image
+   self.movement = MOVEMENT + (not movementSpeed and 5 or movementSpeed)
+   self.acceleration = not movementAcceleration and 0 or movementAcceleration
    
    self.marked = false -- marked for removement
 end

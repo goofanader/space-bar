@@ -57,6 +57,7 @@ function love.load()
    require("classes/player")
    require("classes/bullet")
    require("classes/background")
+   require("classes/easyAlien")
    
    require("states/gameplay")
    require("states/menu")
@@ -67,7 +68,13 @@ function love.load()
       createSaveFile()
       
       -- reload the data
-      --sharecartData = sharecart.love_load(love, args)
+      sharecartData = sharecart.love_load(love, args)
+   end
+   
+   if sharecartData.Misc0 ~= 0 then
+      randomGenerator = love.math.newRandomGenerator(sharecartData.Misc0)
+   else
+      randomGenerator = love.math.newRandomGenerator(1)
    end
    
    currState = Gameplay:new()
