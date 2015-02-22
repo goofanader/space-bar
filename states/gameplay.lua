@@ -27,7 +27,18 @@ function Gameplay:initialize()
 end
 
 function Gameplay.onCollision(dt, shapeA, shapeB, mtvX, mtvY)
-   print(shapeA.class.class.name .. " hit " .. shapeB.class.class.name)
+   if shapeA.class.class.name == "EasyAlien" and shapeB.class.class.name == "Bullet" then
+      shapeA.class:killMe()
+   end
+   
+   if shapeB.class.class.name == "EasyAlien" and shapeA.class.class.name == "Bullet" then
+      shapeB.class:killMe()
+   end
+   if shapeA.class.class.name == "Player" then
+      print(shapeA.class.class.name .. " hit " .. shapeB.class.class.name)
+   elseif shapeB.class.class.name == "Player" then
+      print(shapeA.class.class.name .. " hit " .. shapeB.class.class.name)
+   end
 end
 
 function Gameplay.collisionStop(dt, shapeA, shapeB)
@@ -42,7 +53,13 @@ function Gameplay:draw()
    -- draw the enemies
    for i = self.enemyCounterBase, self.enemyCounter do
       if self.enemyList[i] then
-         self.enemyList[i]:draw()
+         self.enemyList[i].class:draw()
+         
+         if drawHitboxes then
+            love.graphics.setColor(0,255,255, 155)
+            self.enemyList[i]:draw("fill")
+            love.graphics.setColor(255,255,255,255)
+         end
       end
    end
    
@@ -59,6 +76,12 @@ function Gameplay:draw()
    for i = self.bulletCounterBase, self.bulletCounter do
       if self.bulletList[i] then
          self.bulletList[i].class:draw()
+         
+         if drawHitboxes then
+            love.graphics.setColor(255,255,0, 155)
+            self.bulletList[i]:draw("fill")
+            love.graphics.setColor(255,255,255,255)
+         end
       end
    end
 end
@@ -94,7 +117,7 @@ function Gameplay:update(dt)
    -- give the player a bullet if they requested it
    if self.player.class.wantBullet then
       local newBullet = Bullet:new(self.player.class.x + self.player.class.image:getWidth(), self.player.class.y, self.player.class.worldX + self.player.class.image:getWidth(), self.player.class.worldY, "Player", 1, self.bulletCounter)
-      self.bulletList[self.bulletCounter] = self.collider:addRectangle(newBullet.x, newBullet.y, newBullet.image:getWidth(), newBullet.image:getHeight())
+      self.bulletList[self.bulletCounter] = self.collider:addRectangle(newBullet.x, newBullet.y, newBullet.image:getWidth() * newBullet.scale, newBullet.image:getHeight() * newBullet.scale)
       self.bulletList[self.bulletCounter].class = newBullet
       self.bulletList[self.bulletCounter].class.shape = self.bulletList[self.bulletCounter]
       
@@ -110,6 +133,7 @@ function Gameplay:update(dt)
       local enemy = self.enemyList[i]
       
       if enemy then
+         enemy = enemy.class
          enemy:update(dt)
          
          -- remove enemy if marked
@@ -128,11 +152,12 @@ function Gameplay:update(dt)
          if enemy.wantBullet then
             local newBullet = Bullet:new(enemy.x - enemy.laserImage:getWidth(), enemy.y + (enemy.width / 2 * enemy.scale) - (enemy.laserImage:getHeight() / 2), 0, 0, enemy.name, -1, self.bulletCounter, enemy.laserImage, enemy.bulletSpeed)
             enemy.wantBullet = false
-            self.bulletList[self.bulletCounter] = self.collider:addRectangle(newBullet.x, newBullet.y, newBullet.image:getWidth(), newBullet.image:getHeight())
+            self.bulletList[self.bulletCounter] = self.collider:addRectangle(newBullet.x, newBullet.y, newBullet.image:getWidth() * newBullet.scale, newBullet.image:getHeight() * newBullet.scale)
             self.bulletList[self.bulletCounter].class = newBullet
             self.bulletList[self.bulletCounter].class.shape = self.bulletList[self.bulletCounter]
             
             self.collider:addToGroup("bullets", self.bulletList[self.bulletCounter])
+            self.collider:addToGroup("aliens", self.bulletList[self.bulletCounter])
             
             self.bulletCounter = self.bulletCounter + 1
          end
@@ -146,7 +171,13 @@ function Gameplay:update(dt)
    
    self.enemyOverallTime = self.enemyOverallTime + dt
    if randomGenerator:random(1,10) > enemyChance and self:getItemCount(self.enemyList, self.enemyCounterBase, self.enemyCounter) < maxEnemies and self.enemyOverallTime > enemyTime then
-      self.enemyList[self.enemyCounter] = EasyAlien:new()
+      local newAlien = EasyAlien:new()
+      self.enemyList[self.enemyCounter] = self.collider:addRectangle(newAlien.x, newAlien.y, newAlien.width * newAlien.scale, newAlien.height * newAlien.scale)
+      self.enemyList[self.enemyCounter].class = newAlien
+      self.enemyList[self.enemyCounter].class.shape = self.enemyList[self.enemyCounter]
+      
+      self.collider:addToGroup("aliens", self.enemyList[self.enemyCounter])
+      
       self.enemyCounter = self.enemyCounter + 1
       self.enemyOverallTime = 0
    end

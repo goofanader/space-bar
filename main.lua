@@ -52,7 +52,7 @@ function createSaveFile()
 end
 
 function love.load()
-   drawHitboxes = true
+   drawHitboxes = false
    
    love.graphics.setDefaultFilter("nearest")
    windowWidth, windowHeight = love.graphics.getDimensions()

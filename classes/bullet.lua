@@ -19,6 +19,8 @@ function Bullet:initialize(x, y, worldX, worldY, owner, direction, index, image,
    self.acceleration = not movementAcceleration and 0 or movementAcceleration
    
    self.marked = false -- marked for removement
+   
+   self.scale = SCALE
 end
 
 function Bullet:update(dt)
@@ -32,12 +34,12 @@ function Bullet:update(dt)
       self.marked = true
    end
    
-   self.shape:moveTo(self.x - prevX, self.y - prevY)
+   self.shape:move(self.x - prevX, self.y - prevY)
 end
 
 function Bullet:draw()
    if not self.marked then
-      love.graphics.draw(self.image, self.x, self.y, 0, SCALE)
+      love.graphics.draw(self.image, self.x, self.y, 0, self.scale)
    end
 end
 

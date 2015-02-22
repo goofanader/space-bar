@@ -3,6 +3,7 @@ require("middleclass-commons")
 local anim8 = require("libraries/anim8")
 
 Alien = class("Alien")
+Alien.static.deathImage = love.graphics.newImage("images/bigaliensplosion.png")
 
 function Alien:initialize(name, image, x, y, width, height, animationSpeed)
    self.name = name
@@ -19,7 +20,23 @@ function Alien:initialize(name, image, x, y, width, height, animationSpeed)
    
    self.animGrid = anim8.newGrid(width, height, image:getWidth(), image:getHeight())
    animationSpeed = not animationSpeed and 6 / FRAME_RATE or animationSpeed
-   self.animation = anim8.newAnimation(self.animGrid('1-2', 1), animationSpeed)
+   self.mainAnimation = anim8.newAnimation(self.animGrid('1-2', 1), animationSpeed)
+   
+   self.deathAnimation = anim8.newAnimation(self.animGrid('1-2',1), 1 / FRAME_RATE, function(instance)
+         if instance.classObject.deathLoops >= 2 then
+            instance.classObject.marked = true
+            instance:pause()
+         else
+            instance:gotoFrame(1)
+            instance.classObject.deathLoops = instance.classObject.deathLoops + 1
+         end
+      end
+   )
+   self.deathAnimation.classObject = self
+   self.deathLoops = 0
+   self.isDead = false
+   
+   self.animation = self.mainAnimation
 end
 
 function Alien:draw()
@@ -28,6 +45,12 @@ end
 
 function Alien:update(dt)
    self.animation:update(dt)
+end
+
+function Alien:killMe()
+   self.animation = self.deathAnimation
+   self.image = Alien.deathImage
+   self.isDead = true
 end
 
 function Alien:__tostring()

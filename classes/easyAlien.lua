@@ -63,20 +63,29 @@ end
 
 function EasyAlien:update(dt)
    Alien.update(self, dt)
-   self.overallTime = self.overallTime + dt
-   self.movementFunction(self, dt)
-   self.bulletTime = self.bulletTime + dt
    
-   if self.x < -self.width * self.scale then
-      self.marked = true
-   end
-   
-   if self.y < -self.height * self.scale or self.y > windowHeight then
-      self.marked = true
-   end
-   
-   if self.bulletTime > self.maxBulletTime then
-      self.bulletTime = 0
-      self.wantBullet = true
+   if not self.isDead then
+      local prevX, prevY = self.x, self.y
+      
+      self.overallTime = self.overallTime + dt
+      self.movementFunction(self, dt)
+      self.bulletTime = self.bulletTime + dt
+      
+      if self.x < -self.width * self.scale then
+         self.marked = true
+      end
+      
+      if self.y < -self.height * self.scale or self.y > windowHeight then
+         self.marked = true
+      end
+      
+      if self.bulletTime > self.maxBulletTime then
+         self.bulletTime = 0
+         self.wantBullet = true
+      end
+      
+      self.shape:move(self.x - prevX, self.y - prevY)
+   else
+      self.x = self.x - MOVEMENT
    end
 end
