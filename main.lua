@@ -55,6 +55,7 @@ function love.load()
    windowWidth, windowHeight = love.graphics.getDimensions()
    
    require("classes/player")
+   require("classes/bullet")
    
    local sharecartData = sharecart.love_load(love, args)
    if sharecartData == nil then
@@ -66,14 +67,52 @@ function love.load()
    end
    
    player = Player:new()
+   bulletList = {}
+   bulletCounter = 1
+   bulletCounterBase = 1
+   
+   bulletImage = love.graphics.newImage("images/lazr.png")
+end
+
+function addToBulletList(x, y, worldX, worldY, owner, direction)
+   bulletList[bulletCounter] = Bullet:new(x, y, worldX, worldY, owner, direction, bulletCounter)
+   bulletCounter = bulletCounter + 1
+end
+
+function removeFromBulletList(index)
+   bulletList[index] = nil--, index)
+   --bulletCounter = bulletCounter - 1???
+   if index == bulletCounterBase then
+      bulletCounterBase = bulletCounterBase + 1
+   end
 end
 
 function love.update(dt)
+   local tableCopy = {}
+   for i = bulletCounterBase, bulletCounter do
+      if bulletList[i] then
+         table.insert(tableCopy, i, bulletList[i])
+      end
+   end
+   
+   for i = bulletCounterBase, bulletCounter do
+      if bulletList[i] then
+         bulletList[i]:update(dt)
+      end
+   end
+   
    player:update(dt)
 end
 
 function love.draw()
    player:draw()
+   
+   for i = bulletCounterBase, bulletCounter do
+      if bulletList[i] then
+         bulletList[i]:draw()
+      end
+      --it's not drawing here after the first one gets removed. Switch to a key-based system rather than by i... it doesn't work??
+   end
 end
 
 function love.keypressed(key, isrepeat)

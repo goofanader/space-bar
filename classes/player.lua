@@ -19,6 +19,7 @@ function Player:initialize()
    self.animation = anim8.newAnimation(self.grid('1-2', 1), 2 / FRAME_RATE)
    
    self.timeTotal = 0
+   self.bulletTime = BULLET_TIME + 1
 end
 
 function Player:draw()
@@ -27,6 +28,7 @@ end
 
 function Player:update(dt)
    self.timeTotal = self.timeTotal + dt
+   self.bulletTime = self.bulletTime + dt
    self.animation:update(dt)
    
    local prevX, prevY = self.x, self.y
@@ -45,9 +47,10 @@ function Player:update(dt)
       self.x = self.x + MOVEMENT
    end
    
-   if love.keyboard.isDown(" ") then
+   if love.keyboard.isDown(" ") and self.bulletTime > BULLET_TIME then
       -- pew pew lasers
-      
+      addToBulletList(self.x + self.image:getWidth(), self.y, self.worldX + self.image:getWidth(), self.worldY, "Player", 1)
+      self.bulletTime = 0
    end
    
    self.y = self.y + math.sin(self.timeTotal * 10)
