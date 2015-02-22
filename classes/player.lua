@@ -78,6 +78,8 @@ function Player:update(dt)
       self.y = prevY
       self.worldY = self.y
    end
+   
+   self.shape:move(self.x - prevX, self.y - prevY)
 end
 
 function Player:__tostring()

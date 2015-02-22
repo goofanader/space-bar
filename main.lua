@@ -1,6 +1,7 @@
 require("libraries/additionalFunctions")
 local sharecart = require("sharecart")
 require("constants")
+HC = require("libraries/hardoncollider")
 
 function createSaveFile()
    local userDirectory = love.filesystem.getWorkingDirectory()
@@ -51,6 +52,8 @@ function createSaveFile()
 end
 
 function love.load()
+   drawHitboxes = true
+   
    love.graphics.setDefaultFilter("nearest")
    windowWidth, windowHeight = love.graphics.getDimensions()
    

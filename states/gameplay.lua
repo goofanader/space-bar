@@ -4,7 +4,13 @@ require("middleclass-commons")
 Gameplay = class("Gameplay")
 
 function Gameplay:initialize()
-   self.player = Player:new()
+   self.collider = HC(100, self.onCollision, self.collisionStop)
+   local tempPlayer = Player:new()
+   self.player = self.collider:addRectangle(tempPlayer.x, tempPlayer.y, tempPlayer.width * tempPlayer.scale, tempPlayer.height * tempPlayer.scale)
+   self.player.class = tempPlayer
+   self.player.class.shape = self.player
+   --self.collider:addToGroup("playerStuff", self.player)
+   
    self.bulletList = {}
    self.bulletCounter = 1
    self.bulletCounterBase = self.bulletCounter
@@ -18,6 +24,13 @@ function Gameplay:initialize()
    self.background[1] = Background:new(0,0)
    self.background[2] = Background:new(512,0) --513?
    self.background[3] = Background:new(1024,0)
+end
+
+function Gameplay.onCollision(dt, shapeA, shapeB, mtvX, mtvY)
+   print(shapeA.class.class.name .. " hit " .. shapeB.class.class.name)
+end
+
+function Gameplay.collisionStop(dt, shapeA, shapeB)
 end
 
 function Gameplay:draw()
@@ -34,12 +47,18 @@ function Gameplay:draw()
    end
    
    -- draw the player
-   self.player:draw()
+   self.player.class:draw()
+   
+   if drawHitboxes then
+      love.graphics.setColor(255,0,0, 155)
+      self.player:draw("fill")
+      love.graphics.setColor(255,255,255,255)
+   end
    
    -- draw each bullet
    for i = self.bulletCounterBase, self.bulletCounter do
       if self.bulletList[i] then
-         self.bulletList[i]:draw()
+         self.bulletList[i].class:draw()
       end
    end
 end
@@ -53,10 +72,11 @@ function Gameplay:update(dt)
    -- update the bullets
    for i = self.bulletCounterBase, self.bulletCounter do
       if self.bulletList[i] then
-         self.bulletList[i]:update(dt)
+         self.bulletList[i].class:update(dt)
          
          -- remove the bullet if it's marked to be removed
-         if self.bulletList[i].marked then
+         if self.bulletList[i].class.marked then
+            self.collider:remove(self.bulletList[i])
             self.bulletList[i] = nil
             
             if i == self.bulletCounterBase then
@@ -70,12 +90,19 @@ function Gameplay:update(dt)
    end
    
    -- update the player
-   self.player:update(dt)
+   self.player.class:update(dt)
    -- give the player a bullet if they requested it
-   if self.player.wantBullet then
-      self.bulletList[self.bulletCounter] = Bullet:new(self.player.x + self.player.image:getWidth(), self.player.y, self.player.worldX + self.player.image:getWidth(), self.player.worldY, "Player", 1, self.bulletCounter)
+   if self.player.class.wantBullet then
+      local newBullet = Bullet:new(self.player.class.x + self.player.class.image:getWidth(), self.player.class.y, self.player.class.worldX + self.player.class.image:getWidth(), self.player.class.worldY, "Player", 1, self.bulletCounter)
+      self.bulletList[self.bulletCounter] = self.collider:addRectangle(newBullet.x, newBullet.y, newBullet.image:getWidth(), newBullet.image:getHeight())
+      self.bulletList[self.bulletCounter].class = newBullet
+      self.bulletList[self.bulletCounter].class.shape = self.bulletList[self.bulletCounter]
+      
+      self.collider:addToGroup("bullets", self.bulletList[self.bulletCounter])
+      self.collider:addToGroup("playerBullets", self.bulletList[self.bulletCounter])
+      
       self.bulletCounter = self.bulletCounter + 1
-      self.player.wantBullet = false
+      self.player.class.wantBullet = false
    end
    
    -- update the enemies
@@ -99,8 +126,14 @@ function Gameplay:update(dt)
          
          -- shoot a bullet if requested
          if enemy.wantBullet then
-            self.bulletList[self.bulletCounter] = Bullet:new(enemy.x - enemy.laserImage:getWidth(), enemy.y + (enemy.width / 2 * enemy.scale) - (enemy.laserImage:getHeight() / 2), 0, 0, enemy.name, -1, self.bulletCounter, enemy.laserImage, enemy.bulletSpeed)
+            local newBullet = Bullet:new(enemy.x - enemy.laserImage:getWidth(), enemy.y + (enemy.width / 2 * enemy.scale) - (enemy.laserImage:getHeight() / 2), 0, 0, enemy.name, -1, self.bulletCounter, enemy.laserImage, enemy.bulletSpeed)
             enemy.wantBullet = false
+            self.bulletList[self.bulletCounter] = self.collider:addRectangle(newBullet.x, newBullet.y, newBullet.image:getWidth(), newBullet.image:getHeight())
+            self.bulletList[self.bulletCounter].class = newBullet
+            self.bulletList[self.bulletCounter].class.shape = self.bulletList[self.bulletCounter]
+            
+            self.collider:addToGroup("bullets", self.bulletList[self.bulletCounter])
+            
             self.bulletCounter = self.bulletCounter + 1
          end
       end
@@ -117,6 +150,8 @@ function Gameplay:update(dt)
       self.enemyCounter = self.enemyCounter + 1
       self.enemyOverallTime = 0
    end
+   
+   self.collider:update(dt)
 end
 
 function Gameplay:getItemCount(theTable, base, max)

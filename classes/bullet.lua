@@ -22,6 +22,8 @@ function Bullet:initialize(x, y, worldX, worldY, owner, direction, index, image,
 end
 
 function Bullet:update(dt)
+   local prevX, prevY = self.x, self.y
+   
    self.x = self.x + (self.movement * self.direction)
    self.worldX = self.worldX + self.movement * self.direction
    
@@ -29,6 +31,8 @@ function Bullet:update(dt)
       --removeFromBulletList(self.index)
       self.marked = true
    end
+   
+   self.shape:moveTo(self.x - prevX, self.y - prevY)
 end
 
 function Bullet:draw()
