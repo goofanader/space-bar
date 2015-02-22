@@ -54,10 +54,12 @@ function love.load()
    love.graphics.setDefaultFilter("nearest")
    windowWidth, windowHeight = love.graphics.getDimensions()
    
-   require("states/gameplay")
-   require("states/menu")
    require("classes/player")
    require("classes/bullet")
+   require("classes/background")
+   
+   require("states/gameplay")
+   require("states/menu")
    
    local sharecartData = sharecart.love_load(love, args)
    if sharecartData == nil then
