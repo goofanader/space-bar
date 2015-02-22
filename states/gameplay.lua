@@ -9,7 +9,7 @@ function Gameplay:initialize()
    self.player = self.collider:addRectangle(tempPlayer.x, tempPlayer.y, tempPlayer.width * tempPlayer.scale, tempPlayer.height * tempPlayer.scale)
    self.player.class = tempPlayer
    self.player.class.shape = self.player
-   --self.collider:addToGroup("playerStuff", self.player)
+   self.collider:addToGroup("playerStuff", self.player)
    
    self.bulletList = {}
    self.bulletCounter = 1
@@ -34,10 +34,13 @@ function Gameplay.onCollision(dt, shapeA, shapeB, mtvX, mtvY)
    if shapeB.class.class.name == "EasyAlien" and shapeA.class.class.name == "Bullet" then
       shapeB.class:killMe()
    end
-   if shapeA.class.class.name == "Player" then
-      print(shapeA.class.class.name .. " hit " .. shapeB.class.class.name)
-   elseif shapeB.class.class.name == "Player" then
-      print(shapeA.class.class.name .. " hit " .. shapeB.class.class.name)
+   
+   if shapeA.class.class.name == "Player" and shapeB.class.class.name == "Bullet" then
+      shapeA.class:killMe()
+   end
+   
+   if shapeB.class.class.name == "Player" and shapeA.class.class.name == "Bullet" then
+      shapeB.class:killMe()
    end
 end
 
@@ -122,7 +125,7 @@ function Gameplay:update(dt)
       self.bulletList[self.bulletCounter].class.shape = self.bulletList[self.bulletCounter]
       
       self.collider:addToGroup("bullets", self.bulletList[self.bulletCounter])
-      self.collider:addToGroup("playerBullets", self.bulletList[self.bulletCounter])
+      self.collider:addToGroup("playerStuff", self.bulletList[self.bulletCounter])
       
       self.bulletCounter = self.bulletCounter + 1
       self.player.class.wantBullet = false
