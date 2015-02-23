@@ -83,6 +83,10 @@ function love.load()
    end
    
    currState = Menu:new()--Gameplay:new()
+   
+   music = love.audio.newSource("images/spacemusic.wav")
+   music:setLooping(true)
+   music:play()
 end
 
 function love.update(dt)
