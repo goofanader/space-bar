@@ -25,6 +25,7 @@ function Player:initialize()
          if instance.classObject.deathLoops >= 2 then
             instance.classObject.marked = true
             instance:pause()
+            self.isReallyDead = true
          else
             instance:gotoFrame(1)
             instance.classObject.deathLoops = instance.classObject.deathLoops + 1
@@ -34,6 +35,7 @@ function Player:initialize()
    self.deathAnimation.classObject = self
    self.deathLoops = 0
    self.isDead = false
+   self.isReallyDead = false
    
    self.timeTotal = 0
    self.bulletTime = BULLET_TIME + 1

@@ -2,8 +2,9 @@ require("middleclass")
 require("middleclass-commons")
 
 Gameplay = class("Gameplay")
+Gameplay.static.score = 0
 
-function Gameplay:initialize()
+function Gameplay:initialize(hiscore)
    self.collider = HC(100, self.onCollision, self.collisionStop)
    local tempPlayer = Player:new()
    self.player = self.collider:addRectangle(tempPlayer.x, tempPlayer.y, tempPlayer.width * tempPlayer.scale, tempPlayer.height * tempPlayer.scale)
@@ -24,22 +25,29 @@ function Gameplay:initialize()
    self.background[1] = Background:new(0,0)
    self.background[2] = Background:new(512,0) --513?
    self.background[3] = Background:new(1024,0)
+   
+   self.hiscore = hiscore
+   Gameplay.static.score = 0
 end
 
 function Gameplay.onCollision(dt, shapeA, shapeB, mtvX, mtvY)
    if shapeA.class.class.name == "EasyAlien" and shapeB.class.class.name == "Bullet" then
       shapeA.class:killMe()
+      shapeB.class.marked = true
+      Gameplay.static.score = Gameplay.static.score + 1
    end
    
    if shapeB.class.class.name == "EasyAlien" and shapeA.class.class.name == "Bullet" then
       shapeB.class:killMe()
+      shapeA.class.marked = true
+      Gameplay.static.score = Gameplay.static.score + 1
    end
    
-   if shapeA.class.class.name == "Player" and shapeB.class.class.name == "Bullet" then
+   if shapeA.class.class.name == "Player" and (shapeB.class.class.name == "Bullet" or shapeB.class.class.name == "EasyAlien") then
       shapeA.class:killMe()
    end
    
-   if shapeB.class.class.name == "Player" and shapeA.class.class.name == "Bullet" then
+   if shapeB.class.class.name == "Player" and (shapeA.class.class.name == "Bullet" or shapeA.class.class.name == "EasyAlien") then
       shapeB.class:killMe()
    end
 end
@@ -87,6 +95,13 @@ function Gameplay:draw()
          end
       end
    end
+   
+   -- draw the HUD
+   love.graphics.setColor(255, 255, 255, 255)
+   love.graphics.setFont(TEN_FONT)
+   love.graphics.printf("Exit: ESC", windowWidth - 100, 5, 95, "right")
+   love.graphics.printf("Score: " .. Gameplay.static.score, windowWidth / 4, 5, windowWidth / 2, "center")
+   love.graphics.printf("Hi-score: " .. self.hiscore, windowWidth / 4, windowHeight - 20, windowWidth / 2, "center")
 end
 
 function Gameplay:update(dt)
@@ -141,6 +156,7 @@ function Gameplay:update(dt)
          
          -- remove enemy if marked
          if enemy.marked then
+            self.collider:remove(self.enemyList[i])
             self.enemyList[i] = nil
             
             if i == self.enemyCounterBase then
@@ -186,6 +202,15 @@ function Gameplay:update(dt)
    end
    
    self.collider:update(dt)
+   
+   if Gameplay.static.score > self.hiscore then
+      self.hiscore = Gameplay.static.score
+   end
+   
+   if self.player.class.isReallyDead then
+      self.collider:clear()
+      currState = GameOver:new(self.background, Gameplay.static.score, self.hiscore)
+   end
 end
 
 function Gameplay:getItemCount(theTable, base, max)
@@ -200,6 +225,9 @@ function Gameplay:getItemCount(theTable, base, max)
 end
 
 function Gameplay:keypressed(key, isrepeat)
+end
+
+function Gameplay:textinput(text)
 end
 
 function Gameplay:__tostring()

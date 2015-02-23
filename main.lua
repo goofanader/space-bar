@@ -1,6 +1,5 @@
 require("libraries/additionalFunctions")
-local sharecart = require("sharecart")
-require("constants")
+sharecart = require("sharecart")
 HC = require("libraries/hardoncollider")
 
 function createSaveFile()
@@ -57,6 +56,8 @@ function love.load()
    love.graphics.setDefaultFilter("nearest")
    windowWidth, windowHeight = love.graphics.getDimensions()
    
+   require("constants")
+   
    require("classes/player")
    require("classes/bullet")
    require("classes/background")
@@ -64,6 +65,7 @@ function love.load()
    
    require("states/gameplay")
    require("states/menu")
+   require("states/gameOver")
    
    local sharecartData = sharecart.love_load(love, args)
    if sharecartData == nil then
@@ -80,7 +82,7 @@ function love.load()
       randomGenerator = love.math.newRandomGenerator(1)
    end
    
-   currState = Gameplay:new()
+   currState = Menu:new()--Gameplay:new()
 end
 
 function love.update(dt)
@@ -92,11 +94,15 @@ function love.draw()
 end
 
 function love.keypressed(key, isrepeat)
-   if key == "escape" or key == "q" then
+   if key == "escape" then
       love.event.quit()
    end
    
    currState:keypressed(key, isrepeat)
+end
+
+function love.textinput(text)
+   currState:textinput(text)
 end
 
 function love.quit()
