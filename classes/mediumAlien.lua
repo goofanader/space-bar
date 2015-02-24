@@ -3,29 +3,30 @@ require("middleclass-commons")
 require("classes/alien")
 
 local anim8 = require("libraries/anim8")
+local MOVEMENT = MOVEMENT - 1
 
-EasyAlien = class("EasyAlien", Alien)
-EasyAlien.static.images = {}
+MediumAlien = class("MediumAlien", Alien)
+MediumAlien.static.images = {}
 
-for i = 1, 6 do
-   EasyAlien.static.images[i] = love.graphics.newImage("images/alien" .. i .. ".png")
-end
-EasyAlien.static.imageSpeeds = {}
-EasyAlien.static.imageSpeeds[5] = {9 / FRAME_RATE, 3 / FRAME_RATE}
-
-EasyAlien.static.laserImages = {}
 for i = 1, 3 do
-   EasyAlien.static.laserImages[i] = love.graphics.newImage("images/alienlazr" .. i .. ".png")
+   MediumAlien.static.images[i] = love.graphics.newImage("images/bigalien" .. i .. ".png")
+end
+MediumAlien.static.imageSpeeds = {}
+MediumAlien.static.imageSpeeds[5] = {9 / FRAME_RATE, 3 / FRAME_RATE}
+
+MediumAlien.static.laserImages = {}
+for i = 1, 3 do
+   MediumAlien.static.laserImages[i] = love.graphics.newImage("images/alienlazr" .. i .. ".png")
 end
 
-EasyAlien.static.deathImage = love.graphics.newImage("images/smallaliensplode.png")
+MediumAlien.static.deathImage = love.graphics.newImage("images/bigaliensplosion.png")
 
-EasyAlien.static.movements = {}
-EasyAlien.static.movements[1] = function(self, dt)
+MediumAlien.static.movements = {}
+MediumAlien.static.movements[1] = function(self, dt)
    self.x = self.x - MOVEMENT
    self.y = self.y + math.sin(self.overallTime * 10)
 end
-EasyAlien.static.movements[2] = function(self, dt)
+MediumAlien.static.movements[2] = function(self, dt)
    local prevY = self.y
    self.x = self.x + math.sin(self.overallTime * 10) - MOVEMENT
    self.y = self.y + math.cos(self.overallTime * 10) + MOVEMENT * self.yDirection
@@ -35,38 +36,41 @@ EasyAlien.static.movements[2] = function(self, dt)
       self.y = self.y + math.cos(self.overallTime * 10) + MOVEMENT * self.yDirection
    end
 end
-EasyAlien.static.movements[3] = function(self, dt)
+MediumAlien.static.movements[3] = function(self, dt)
    self.x = self.x - math.cos(self.overallTime / 10) - MOVEMENT
    self.y = self.y - math.cos(self.overallTime * 10)
 end
-EasyAlien.static.movements[4] = function(self, dt)
+MediumAlien.static.movements[4] = function(self, dt)
    self.x = self.x + math.sin(self.overallTime * 10) - MOVEMENT
    self.y = self.y + math.cos(self.overallTime * 10)
 end
 
-function EasyAlien:initialize()
+function MediumAlien:initialize()
    local x = windowWidth
-   local y = randomGenerator:random(windowHeight - EasyAlien.images[1]:getHeight() * SCALE)
-   local imageIndex = randomGenerator:random(1, table.getn(EasyAlien.images))
+   local y = randomGenerator:random(windowHeight - MediumAlien.images[1]:getHeight() * SCALE)
+   local imageIndex = randomGenerator:random(1, table.getn(MediumAlien.images))
    
-   Alien.initialize(self, "Easy", EasyAlien.images[imageIndex], x, y, 8, 8, EasyAlien.imageSpeeds[imageIndex])
+   Alien.initialize(self, "Easy", MediumAlien.images[imageIndex], x, y, 16, 16, MediumAlien.imageSpeeds[imageIndex])
    
-   self.laserImage = EasyAlien.laserImages[randomGenerator:random(1,3)]
+   self.laserImage = MediumAlien.laserImages[randomGenerator:random(1,3)]
    self.bulletSpeed = MOVEMENT - 1
    
    self.maxBulletTime = randomGenerator:random(10,25) * .1
    self.bulletTime = randomGenerator:random(self.maxBulletTime / .1) * .1
-   self.movementFunction = EasyAlien.movements[randomGenerator:random(1, table.getn(EasyAlien.movements))]
+   self.movementFunction = MediumAlien.movements[randomGenerator:random(1, table.getn(MediumAlien.movements))]
    
    self.overallTime = 0
    self.yDirection = 1
    self.xDirection = 1
    
-   self.deathImage = EasyAlien.deathImage
-   self.lives = 1
+   self.deathImage = MediumAlien.deathImage
+   self.lives = 5
+   
+   self.width = 16
+   self.height = 16
 end
 
-function EasyAlien:update(dt)
+function MediumAlien:update(dt)
    Alien.update(self, dt)
    
    if not self.isDead then

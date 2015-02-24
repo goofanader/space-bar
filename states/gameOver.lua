@@ -1,26 +1,28 @@
 require("middleclass")
 require("middleclass-commons")
 
-GameOver = class("GameOver")
+GameOver = class("GameOver", State)
 
-function GameOver:initialize(backgrounds, score, hiscore)
+function GameOver:initialize(backgrounds, score, hiscore, x, y)
+   State.initialize(self, "GameOver")
+   
    self.background = backgrounds
-   --[[self.background[1] = Background:new(0,0)
-   self.background[2] = Background:new(512,0) --513?
-   self.background[3] = Background:new(1024,0)]]
-
-   --self.font = GameOver.font
-   local sharecartData = sharecart.love_load(love, args)
    
    self.nameString = "Name: "
    self.cursor = "_"
-   self.inputtedText = sharecartData.PlayerName
+   self.inputtedText = getSharecartData("PlayerName")
+   
+   if self.inputtedText:len() > MAX_NAME_CHARS then
+      self.inputtedText = self.inputtedText:sub(1, MAX_NAME_CHARS)
+   end
 
    self.namePrompt = self.nameString .. self.cursor
 
    self.overallTime = 0
    self.score = score or 0
    self.hiscore = hiscore or 0
+   self.x = x or 0
+   self.y = y or 0
 
    love.keyboard.setKeyRepeat(true)
    self.isTyping = true
@@ -37,7 +39,7 @@ function GameOver:update(dt)
    end]]
    self.overallTime = self.overallTime + dt
 
-   if self.overallTime > 1 then
+   if self.overallTime > .5 then
       self.overallTime = 0
 
       if self.isTyping then
@@ -71,7 +73,7 @@ function GameOver:draw()
    love.graphics.printf(self.nameString .. self.inputtedText .. self.cursor, windowWidth / 4, windowHeight / 8 * 5, windowWidth / 2, "left")
    
    if not self.isTyping then
-      love.graphics.printf("Play Again: Spacebar", windowWidth / 4, windowHeight / 8 * 5, windowWidth / 2, "right")
+      love.graphics.printf("Play Again: Spacebar", windowWidth / 4, windowHeight / 8 * 3.5, windowWidth / 2, "center")
    end
 end
 
@@ -85,13 +87,22 @@ function GameOver:keypressed(key, isrepeat)
       self.cursor = " "
       
       -- save name
-      local sharecartData = sharecart.love_load(love, args)
-      sharecartData.PlayerName = self.inputtedText
+      --local sharecartData = sharecart.love_load(love, args)
+      saveToSharecart("PlayerName", self.inputtedText)
       love.keyboard.setKeyRepeat(false)
       
       -- save scores
-      sharecartData.Misc0 = self.score
-      sharecartData.Misc1 = self.hiscore
+      saveToSharecart("Misc0", mod(self.score, MAX_MISC))
+      saveToSharecart("Misc1", mod(self.hiscore, MAX_MISC))
+      saveToSharecart("MapX", math.floor(mod(self.x, MAX_COORDINATES)))
+      saveToSharecart("MapY", math.floor(mod(self.y, MAX_COORDINATES)))
+      
+      -- randomly change sharecart switches, hehe
+      for i = 0, MAX_SWITCHES do
+         local switch = "Switch" .. i
+         local switchValue = randomGenerator:random()
+         saveToSharecart(switch, switchValue >= .5)
+      end
    end
 
    if key == "backspace" and self.isTyping then
@@ -100,7 +111,7 @@ function GameOver:keypressed(key, isrepeat)
 end
 
 function GameOver:textinput(text)
-   if self.isTyping then
+   if self.isTyping and self.inputtedText:len() < MAX_NAME_CHARS then
       self.inputtedText = self.inputtedText .. text
    end
 end

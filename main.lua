@@ -40,14 +40,40 @@ function createSaveFile()
       iniFileObject:write("Misc3=0\n")
       iniFileObject:write("PlayerName=Player\n")
       
-      for i = 0, 7 do
-         iniFileObject:write("Switch" .. i .. "=True\n")
+      for i = 0, MAX_SWITCHES do
+         iniFileObject:write("Switch" .. i .. "=FALSE\n")
       end
       iniFileObject:close()
    else
       print("Could not create file!")
       love.event.quit()
    end
+end
+
+function saveToSharecart(varName, data)
+   local sharecartData = sharecart.love_load(love, args)
+   if sharecartData == nil then
+      -- ini file not found
+      createSaveFile()
+      
+      -- reload the data
+      sharecartData = sharecart.love_load(love, args)
+   end
+   
+   sharecartData[varName] = data
+end
+
+function getSharecartData(varName)
+   local sharecartData = sharecart.love_load(love, args)
+   if sharecartData == nil then
+      -- ini file not found
+      createSaveFile()
+      
+      -- reload the data
+      sharecartData = sharecart.love_load(love, args)
+   end
+   
+   return sharecartData[varName]
 end
 
 function love.load()
@@ -62,22 +88,16 @@ function love.load()
    require("classes/bullet")
    require("classes/background")
    require("classes/easyAlien")
+   require("classes/mediumAlien")
    
+   require("states/state")
    require("states/gameplay")
    require("states/menu")
    require("states/gameOver")
    
-   local sharecartData = sharecart.love_load(love, args)
-   if sharecartData == nil then
-      print("ini file not found")
-      createSaveFile()
-      
-      -- reload the data
-      sharecartData = sharecart.love_load(love, args)
-   end
-   
-   if sharecartData.Misc0 ~= 0 then
-      randomGenerator = love.math.newRandomGenerator(sharecartData.Misc0)
+   local misc0 = getSharecartData("Misc0")
+   if misc0 ~= 0 then
+      randomGenerator = love.math.newRandomGenerator(misc0)
    else
       randomGenerator = love.math.newRandomGenerator(1)
    end

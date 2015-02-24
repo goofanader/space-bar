@@ -106,6 +106,8 @@ function Player:killMe()
    self.animation = self.deathAnimation
    self.image = Player.deathImage
    self.isDead = true
+   
+   return true
 end
 
 function Player:__tostring()

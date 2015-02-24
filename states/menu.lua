@@ -1,14 +1,15 @@
 require("middleclass")
 require("middleclass-commons")
 
-Menu = class("Menu")
+Menu = class("Menu", State)
 
 Menu.static.titleImage = love.graphics.newImage("images/spacebar.png")
 Menu.static.arrowsImage = love.graphics.newImage("images/arrowkeys.png")
 
 function Menu:initialize()
-   local sharecartData = sharecart.love_load(love, args)
-   self.hiscore = sharecartData.Misc1
+   State.initialize(self, "Menu")
+   
+   self.hiscore = getSharecartData("Misc1")
    self.score = 0
    
    self.background = {}
@@ -79,9 +80,6 @@ function Menu:keypressed(key, isrepeat)
    if key == " " then
       currState = Gameplay:new(self.hiscore)
    end
-end
-
-function Menu:textinput(text)
 end
 
 function Menu:__tostring()

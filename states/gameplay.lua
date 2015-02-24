@@ -1,10 +1,12 @@
 require("middleclass")
 require("middleclass-commons")
 
-Gameplay = class("Gameplay")
+Gameplay = class("Gameplay", State)
 Gameplay.static.score = 0
 
 function Gameplay:initialize(hiscore)
+   State.initialize(self, "Gameplay")
+   
    self.collider = HC(100, self.onCollision, self.collisionStop)
    local tempPlayer = Player:new()
    self.player = self.collider:addRectangle(tempPlayer.x, tempPlayer.y, tempPlayer.width * tempPlayer.scale, tempPlayer.height * tempPlayer.scale)
@@ -31,23 +33,23 @@ function Gameplay:initialize(hiscore)
 end
 
 function Gameplay.onCollision(dt, shapeA, shapeB, mtvX, mtvY)
-   if shapeA.class.class.name == "EasyAlien" and shapeB.class.class.name == "Bullet" then
+   if (shapeA.class.class.name == "EasyAlien" or shapeA.class.class.name == "MediumAlien") and shapeB.class.class.name == "Bullet" and not shapeA.class.isDead then
       shapeA.class:killMe()
       shapeB.class.marked = true
       Gameplay.static.score = Gameplay.static.score + 1
    end
    
-   if shapeB.class.class.name == "EasyAlien" and shapeA.class.class.name == "Bullet" then
+   if (shapeB.class.class.name == "EasyAlien" or shapeB.class.class.name == "MediumAlien") and shapeA.class.class.name == "Bullet" and not shapeB.class.isDead then
       shapeB.class:killMe()
       shapeA.class.marked = true
       Gameplay.static.score = Gameplay.static.score + 1
    end
    
-   if shapeA.class.class.name == "Player" and (shapeB.class.class.name == "Bullet" or shapeB.class.class.name == "EasyAlien") then
+   if shapeA.class.class.name == "Player" and not shapeA.class.isDead and (shapeB.class.class.name == "Bullet" or ((shapeB.class.class.name == "EasyAlien" or shapeB.class.class.name == "MediumAlien") and not shapeB.class.isDead)) then
       shapeA.class:killMe()
    end
    
-   if shapeB.class.class.name == "Player" and (shapeA.class.class.name == "Bullet" or shapeA.class.class.name == "EasyAlien") then
+   if shapeB.class.class.name == "Player" and not shapeB.class.isDead and (shapeA.class.class.name == "Bullet" or ((shapeA.class.class.name == "EasyAlien" or shapeA.class.class.name == "MediumAlien") and not shapeA.class.isDead)) then
       shapeB.class:killMe()
    end
 end
@@ -185,10 +187,23 @@ function Gameplay:update(dt)
    
    -- determine whether to create a new enemy
    local enemyChance = 9
+   local bigEnemyChance = 9.5
    local maxEnemies = 100--3
    local enemyTime = randomGenerator:random(7,15) * .1
    
    self.enemyOverallTime = self.enemyOverallTime + dt
+   if randomGenerator:random(1,10) > bigEnemyChance and self.enemyOverallTime > enemyTime then
+      local newAlien = MediumAlien:new()
+      self.enemyList[self.enemyCounter] = self.collider:addRectangle(newAlien.x, newAlien.y, newAlien.width * newAlien.scale, newAlien.height * newAlien.scale)
+      self.enemyList[self.enemyCounter].class = newAlien
+      self.enemyList[self.enemyCounter].class.shape = self.enemyList[self.enemyCounter]
+      
+      self.collider:addToGroup("aliens", self.enemyList[self.enemyCounter])
+      
+      self.enemyCounter = self.enemyCounter + 1
+      self.enemyOverallTime = 0
+   end
+   
    if randomGenerator:random(1,10) > enemyChance and self:getItemCount(self.enemyList, self.enemyCounterBase, self.enemyCounter) < maxEnemies and self.enemyOverallTime > enemyTime then
       local newAlien = EasyAlien:new()
       self.enemyList[self.enemyCounter] = self.collider:addRectangle(newAlien.x, newAlien.y, newAlien.width * newAlien.scale, newAlien.height * newAlien.scale)
@@ -208,8 +223,10 @@ function Gameplay:update(dt)
    end
    
    if self.player.class.isReallyDead then
+      local x, y = self.player.class.worldX, self.player.class.worldY
+      
       self.collider:clear()
-      currState = GameOver:new(self.background, Gameplay.static.score, self.hiscore)
+      currState = GameOver:new(self.background, Gameplay.static.score, self.hiscore, x, y)
    end
 end
 
@@ -222,12 +239,6 @@ function Gameplay:getItemCount(theTable, base, max)
    end
    
    return ret
-end
-
-function Gameplay:keypressed(key, isrepeat)
-end
-
-function Gameplay:textinput(text)
 end
 
 function Gameplay:__tostring()

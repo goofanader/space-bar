@@ -3,7 +3,7 @@ require("middleclass-commons")
 local anim8 = require("libraries/anim8")
 
 Alien = class("Alien")
-Alien.static.deathImage = love.graphics.newImage("images/bigaliensplosion.png")
+--Alien.static.deathImage = love.graphics.newImage("images/bigaliensplosion.png")
 
 function Alien:initialize(name, image, x, y, width, height, animationSpeed)
    self.name = name
@@ -37,6 +37,7 @@ function Alien:initialize(name, image, x, y, width, height, animationSpeed)
    self.isDead = false
    
    self.animation = self.mainAnimation
+   self.lives = 1
 end
 
 function Alien:draw()
@@ -48,9 +49,15 @@ function Alien:update(dt)
 end
 
 function Alien:killMe()
-   self.animation = self.deathAnimation
-   self.image = Alien.deathImage
-   self.isDead = true
+   self.lives = self.lives - 1
+   
+   if self.lives <= 0 then
+      self.animation = self.deathAnimation
+      self.image = self.deathImage
+      self.isDead = true
+   end
+   
+   return true
 end
 
 function Alien:__tostring()
