@@ -3,8 +3,8 @@ require("middleclass-commons")
 
 Menu = class("Menu", State)
 
-Menu.static.titleImage = love.graphics.newImage("images/spacebar.png")
-Menu.static.arrowsImage = love.graphics.newImage("images/arrowkeys.png")
+Menu.static.titleImage = love.graphics.newImage("media/images/spacebar.png")
+Menu.static.arrowsImage = love.graphics.newImage("media/images/arrowkeys.png")
 
 function Menu:initialize()
    State.initialize(self, "Menu")

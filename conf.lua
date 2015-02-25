@@ -5,4 +5,5 @@ function love.conf(t)
    t.window.title = "Space Bar"
    t.window.borderless = true
    t.console = false
+   --t.window.resizable = true
 end

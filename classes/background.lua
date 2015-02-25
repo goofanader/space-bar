@@ -2,7 +2,7 @@ require("middleclass")
 require("middleclass-commons")
 
 Background = class("Background")
-Background.static.image = love.graphics.newImage("images/space.png")
+Background.static.image = love.graphics.newImage("media/images/space.png")
 
 function Background:initialize(x, y)
    self.image = Background.static.image
@@ -15,7 +15,7 @@ end
 
 function Background:update(dt)
    self.x = self.x - self.movement
-   if self.x <= -self.image:getWidth() + 4 then
+   if self.x <= -self.image:getWidth() + 3 then
       self.x = windowWidth
    end
 end

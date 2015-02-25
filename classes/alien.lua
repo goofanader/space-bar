@@ -4,6 +4,7 @@ local anim8 = require("libraries/anim8")
 
 Alien = class("Alien")
 --Alien.static.deathImage = love.graphics.newImage("images/bigaliensplosion.png")
+Alien.static.deathSound = love.sound.newSoundData("media/sound/Explosion.wav")
 
 function Alien:initialize(name, image, x, y, width, height, animationSpeed)
    self.name = name
@@ -38,6 +39,9 @@ function Alien:initialize(name, image, x, y, width, height, animationSpeed)
    
    self.animation = self.mainAnimation
    self.lives = 1
+   
+   self.deathSound = Alien.deathSound
+   self.deathSoundVolume = .1
 end
 
 function Alien:draw()
@@ -55,6 +59,8 @@ function Alien:killMe()
       self.animation = self.deathAnimation
       self.image = self.deathImage
       self.isDead = true
+      
+      playSound(self.deathSound, self.deathSoundVolume)
    end
    
    return true

@@ -76,8 +76,17 @@ function getSharecartData(varName)
    return sharecartData[varName]
 end
 
+function playSound(sound, volume)
+   volume = volume or 1.0
+   
+   local newSound = love.audio.newSource(sound, "static")
+   newSound:setVolume(volume)
+   newSound:play()
+end
+
 function love.load()
    drawHitboxes = false
+   --overallTime = 0
    
    love.graphics.setDefaultFilter("nearest")
    windowWidth, windowHeight = love.graphics.getDimensions()
@@ -89,6 +98,7 @@ function love.load()
    require("classes/background")
    require("classes/easyAlien")
    require("classes/mediumAlien")
+   require("classes/bossAlien")
    
    require("states/state")
    require("states/gameplay")
@@ -104,13 +114,16 @@ function love.load()
    
    currState = Menu:new()--Gameplay:new()
    
-   music = love.audio.newSource("images/spacemusic.wav")
+   music = love.audio.newSource("media/sound/spacemusic.wav")
    music:setLooping(true)
    music:play()
 end
 
 function love.update(dt)
+   --overallTime = overallTime + dt
    currState:update(dt)
+   --[[local width, height, tables = love.window.getMode()
+   love.window.setMode(windowWidth, windowHeight, {x=tables.x + 1, y=tables.y + 1, borderless=true})]]
 end
 
 function love.draw()
@@ -127,6 +140,11 @@ end
 
 function love.textinput(text)
    currState:textinput(text)
+end
+
+function love.resize(width, height)
+   windowWidth = width
+   windowHeight = height
 end
 
 function love.quit()

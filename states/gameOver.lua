@@ -2,6 +2,7 @@ require("middleclass")
 require("middleclass-commons")
 
 GameOver = class("GameOver", State)
+GameOver.static.endTypingSound = love.sound.newSoundData("media/sound/Name_Entered.wav")
 
 function GameOver:initialize(backgrounds, score, hiscore, x, y)
    State.initialize(self, "GameOver")

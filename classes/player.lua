@@ -3,9 +3,10 @@ require 'middleclass-commons'
 local anim8 = require 'libraries/anim8'
 
 Player = class("Player")
-Player.static.guyImage = love.graphics.newImage("images/spaceguy.png")
-Player.static.shipImage = love.graphics.newImage("images/spaceship.png")
-Player.static.deathImage = love.graphics.newImage("images/shipasplode.png")
+Player.static.guyImage = love.graphics.newImage("media/images/spaceguy.png")
+Player.static.shipImage = love.graphics.newImage("media/images/spaceship.png")
+Player.static.deathImage = love.graphics.newImage("media/images/shipasplode.png")
+Player.static.deathSound = love.sound.newSoundData("media/sound/Player_Death.wav")
 
 function Player:initialize()
    self.image = Player.static.guyImage
@@ -107,6 +108,7 @@ function Player:killMe()
    self.image = Player.deathImage
    self.isDead = true
    
+   playSound(Player.deathSound, .5)
    return true
 end
 

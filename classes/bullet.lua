@@ -2,9 +2,10 @@ require("middleclass")
 require("middleclass-commons")
 
 Bullet = class("Bullet")
-Bullet.static.image = love.graphics.newImage("images/lazr.png")
+Bullet.static.image = love.graphics.newImage("media/images/lazr.png")
+Bullet.static.sound = love.sound.newSoundData("media/sound/Laser_shoot.wav")
 
-function Bullet:initialize(x, y, worldX, worldY, owner, direction, index, image, movementSpeed, movementAcceleration)
+function Bullet:initialize(x, y, worldX, worldY, owner, direction, index, image, movementSpeed, movementAcceleration, sound)
    self.x = x
    self.y = y
    self.worldX = worldX
@@ -21,6 +22,8 @@ function Bullet:initialize(x, y, worldX, worldY, owner, direction, index, image,
    self.marked = false -- marked for removement
    
    self.scale = SCALE
+   
+   playSound(Bullet.sound, .05)
 end
 
 function Bullet:update(dt)

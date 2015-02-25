@@ -9,17 +9,17 @@ MediumAlien = class("MediumAlien", Alien)
 MediumAlien.static.images = {}
 
 for i = 1, 3 do
-   MediumAlien.static.images[i] = love.graphics.newImage("images/bigalien" .. i .. ".png")
+   MediumAlien.static.images[i] = love.graphics.newImage("media/images/bigalien" .. i .. ".png")
 end
 MediumAlien.static.imageSpeeds = {}
 MediumAlien.static.imageSpeeds[5] = {9 / FRAME_RATE, 3 / FRAME_RATE}
 
 MediumAlien.static.laserImages = {}
 for i = 1, 3 do
-   MediumAlien.static.laserImages[i] = love.graphics.newImage("images/alienlazr" .. i .. ".png")
+   MediumAlien.static.laserImages[i] = love.graphics.newImage("media/images/alienlazr" .. i .. ".png")
 end
 
-MediumAlien.static.deathImage = love.graphics.newImage("images/bigaliensplosion.png")
+MediumAlien.static.deathImage = love.graphics.newImage("media/images/bigaliensplosion.png")
 
 MediumAlien.static.movements = {}
 MediumAlien.static.movements[1] = function(self, dt)
@@ -50,7 +50,7 @@ function MediumAlien:initialize()
    local y = randomGenerator:random(windowHeight - MediumAlien.images[1]:getHeight() * SCALE)
    local imageIndex = randomGenerator:random(1, table.getn(MediumAlien.images))
    
-   Alien.initialize(self, "Easy", MediumAlien.images[imageIndex], x, y, 16, 16, MediumAlien.imageSpeeds[imageIndex])
+   Alien.initialize(self, "Medium", MediumAlien.images[imageIndex], x, y, 16, 16, MediumAlien.imageSpeeds[imageIndex])
    
    self.laserImage = MediumAlien.laserImages[randomGenerator:random(1,3)]
    self.bulletSpeed = MOVEMENT - 1

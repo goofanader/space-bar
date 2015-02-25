@@ -8,17 +8,17 @@ EasyAlien = class("EasyAlien", Alien)
 EasyAlien.static.images = {}
 
 for i = 1, 6 do
-   EasyAlien.static.images[i] = love.graphics.newImage("images/alien" .. i .. ".png")
+   EasyAlien.static.images[i] = love.graphics.newImage("media/images/alien" .. i .. ".png")
 end
 EasyAlien.static.imageSpeeds = {}
 EasyAlien.static.imageSpeeds[5] = {9 / FRAME_RATE, 3 / FRAME_RATE}
 
 EasyAlien.static.laserImages = {}
 for i = 1, 3 do
-   EasyAlien.static.laserImages[i] = love.graphics.newImage("images/alienlazr" .. i .. ".png")
+   EasyAlien.static.laserImages[i] = love.graphics.newImage("media/images/alienlazr" .. i .. ".png")
 end
 
-EasyAlien.static.deathImage = love.graphics.newImage("images/smallaliensplode.png")
+EasyAlien.static.deathImage = love.graphics.newImage("media/images/smallaliensplode.png")
 
 EasyAlien.static.movements = {}
 EasyAlien.static.movements[1] = function(self, dt)
