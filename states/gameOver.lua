@@ -11,7 +11,7 @@ function GameOver:initialize(backgrounds, score, hiscore, x, y, gameTime)
    
    self.nameString = "Name: "
    self.cursor = "_"
-   self.inputtedText = rtrim(getSharecartData("PlayerName"))
+   self.inputtedText = rtrim(tostring(getSharecartData("PlayerName")))
    
    if self.inputtedText:len() > MAX_NAME_CHARS then
       self.inputtedText = self.inputtedText:sub(1, MAX_NAME_CHARS)

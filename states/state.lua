@@ -16,6 +16,9 @@ end
 function State:keypressed(key, isrepeat)
 end
 
+function State:keyreleased(key)
+end
+
 function State:textinput(text)
 end
 

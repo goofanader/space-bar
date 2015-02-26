@@ -7,6 +7,7 @@ Player.static.guyImage = love.graphics.newImage("media/images/spaceguy.png")
 Player.static.shipImage = love.graphics.newImage("media/images/spaceship.png")
 Player.static.deathImage = love.graphics.newImage("media/images/shipasplode.png")
 Player.static.deathSound = love.sound.newSoundData("media/sound/Player_Death.wav")
+Player.static.gotHit = love.sound.newSoundData("media/sound/Hit_Hurt4.wav")
 
 function Player:initialize()
    self.image = Player.static.guyImage
@@ -80,21 +81,28 @@ function Player:update(dt)
       local prevWX, prevWY = self.worldX, self.worldY
 
       --update movement via keyboard presses
-      if love.keyboard.isDown("up") then
+      local keysDown = keyPressQueue:getRepeats()
+      
+      --[[for k,v in pairs(keysDown) do
+         print(k,v)
+      end
+      print("===")]]
+      
+      if keysDown["up"] then
          self.y = self.y - MOVEMENT
       end
-      if love.keyboard.isDown("down") then
+      if keysDown["down"] then
          self.y = self.y + MOVEMENT
       end
 
-      if love.keyboard.isDown("left") then
+      if keysDown["left"] then
          self.x = self.x - MOVEMENT
       end
-      if love.keyboard.isDown("right") then
+      if keysDown["right"] then
          self.x = self.x + MOVEMENT
       end
 
-      if love.keyboard.isDown(" ") and self.bulletTime > BULLET_TIME then
+      if keysDown[" "] and self.bulletTime > BULLET_TIME then
          -- pew pew lasers
          --[[addToBulletList(self.x + self.image:getWidth(), self.y, self.worldX + self.image:getWidth(), self.worldY, "Player", 1)]]
          self.wantBullet = true
@@ -125,9 +133,9 @@ function Player:update(dt)
       if self.isGhost then
          self.ghostTime = self.ghostTime + dt
 
-         if self.ghostTime > .1 then
+         if self.ghostTime > .2 then
             self.ghostTime = 0
-            self.ghostAlpha = self.ghostAlpha == 255 and 255 / 2 or 255
+            self.ghostAlpha = self.ghostAlpha == 255 and 0 or 255
             self.ghostCounter = self.ghostCounter + 1
             
             if self.ghostCounter > 7 then
@@ -154,6 +162,8 @@ function Player:killMe()
       else
          self.wantsGhost = true
          self.isGhost = true
+         
+         playSound(Player.gotHit, .2)
       end
    end
 

@@ -7,7 +7,7 @@ FIFTY_FONT = love.graphics.newFont("media/images/04B_03__.TTF", 50)
 TEN_FONT = love.graphics.newFont("media/images/04B_03__.TTF", 15)
 TWENTY_FONT = love.graphics.newFont("media/images/04B_03__.TTF", 25)
 
-MAX_NAME_CHARS = 100
+MAX_NAME_CHARS = 30
 MAX_MISC = 65535
 MAX_COORDINATES = 1023
 MAX_SWITCHES = 7
