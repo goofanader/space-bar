@@ -17,18 +17,14 @@ function getSharecartDat()
    end
 
    for i = 2, #directorySplit - 1 do
+      if osname == "OS X" and love.filesystem.isFused() and directorySplit[i]:find("%.app") then
+         break
+      end
+
       iniFileString = iniFileString .. slashes .. directorySplit[i]
    end
 
    local datFolder = iniFileString .. slashes .. "dat"
-   if osname ~= "Windows" then
-      -- escape any spaces in datFolder
-      local words = split(datFolder, " ")
-      datFolder = words[1]
-      for i = 2, #words do
-         datFolder = datFolder .. "\\ " .. words[i]
-      end
-   end
 
    return datFolder, slashes
 end
@@ -40,7 +36,16 @@ function createSaveFile()
    local quotes = love._os == "Windows" and "\"" or ""
 
    -- it would be nice to check if dat folder already exists, but whatever
-   os.execute("mkdir " .. quotes .. datFolder .. quotes)
+   local mkdirDatFolder = datFolder
+   if love._os ~= "Windows" then
+      -- escape any spaces in mkdirDatFolder
+      local words = split(mkdirDatFolder, " ")
+      mkdirDatFolder = words[1]
+      for i = 2, #words do
+         mkdirDatFolder = mkdirDatFolder .. "\\ " .. words[i]
+      end
+   end
+   os.execute("mkdir " .. quotes .. mkdirDatFolder .. quotes)
 
    iniFileObject = io.open(datFolder .. slashes .."o_o.ini", "w")
 
@@ -78,7 +83,7 @@ function checkSharecartData()
       ) then
       return reloadSharecartData()
    end
-   
+
    if sharecartData == nil then
       --print("sharecart null")
       -- ini file not found
