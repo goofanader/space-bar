@@ -20,12 +20,12 @@ function createSaveFile()
       slashes = "\\"
    end
    
-   for i = 2, table.getn(directorySplit) - 1 do
+   for i = 2, #directorySplit - 1 do
       iniFileString = iniFileString .. slashes .. directorySplit[i]
    end
    
    print("iniFileString: " .. iniFileString)
-   os.execute("mkdir " .. iniFileString .. slashes .. "dat")
+   os.execute("mkdir \"" .. iniFileString .. slashes .. "dat\"")
    
    iniFileObject = io.open(iniFileString .. slashes .. "dat" .. slashes .."o_o.ini", "w")
    

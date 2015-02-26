@@ -4,14 +4,14 @@ require("middleclass-commons")
 GameOver = class("GameOver", State)
 GameOver.static.endTypingSound = love.sound.newSoundData("media/sound/Name_Entered.wav")
 
-function GameOver:initialize(backgrounds, score, hiscore, x, y)
+function GameOver:initialize(backgrounds, score, hiscore, x, y, gameTime)
    State.initialize(self, "GameOver")
    
    self.background = backgrounds
    
    self.nameString = "Name: "
    self.cursor = "_"
-   self.inputtedText = getSharecartData("PlayerName")
+   self.inputtedText = rtrim(getSharecartData("PlayerName"))
    
    if self.inputtedText:len() > MAX_NAME_CHARS then
       self.inputtedText = self.inputtedText:sub(1, MAX_NAME_CHARS)
@@ -24,6 +24,7 @@ function GameOver:initialize(backgrounds, score, hiscore, x, y)
    self.hiscore = hiscore or 0
    self.x = x or 0
    self.y = y or 0
+   self.gameTime = gameTime
 
    love.keyboard.setKeyRepeat(true)
    self.isTyping = true
@@ -95,6 +96,7 @@ function GameOver:keypressed(key, isrepeat)
       -- save scores
       saveToSharecart("Misc0", mod(self.score, MAX_MISC))
       saveToSharecart("Misc1", mod(self.hiscore, MAX_MISC))
+      saveToSharecart("Misc2", mod(math.ceil(self.gameTime), MAX_MISC))
       saveToSharecart("MapX", math.floor(mod(self.x, MAX_COORDINATES)))
       saveToSharecart("MapY", math.floor(mod(self.y, MAX_COORDINATES)))
       

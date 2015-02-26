@@ -1,3 +1,11 @@
+-- remove trailing whitespace from string.
+-- http://en.wikipedia.org/wiki/Trim_(8programming)
+function rtrim(s)
+  local n = #s
+  while n > 0 and s:find("^%s", n) do n = n - 1 end
+  return s:sub(1, n)
+end
+
 -- convert string to boolean
 function strToBool(str)
    if str == "true" then

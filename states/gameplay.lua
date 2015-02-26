@@ -35,6 +35,8 @@ function Gameplay:initialize(hiscore)
 
    self.bossObject = nil
    self.scale = 1
+   
+   self.beginTime = love.timer.getTime()
 
    playSound(Gameplay.beginGameSound, .3)
 end
@@ -114,6 +116,9 @@ function Gameplay:draw()
    love.graphics.printf("Exit: ESC", windowWidth - 100, 5, 95, "right")
    love.graphics.printf("Score: " .. Gameplay.static.score, windowWidth / 4, 5, windowWidth / 2, "center")
    love.graphics.printf("Hi-score: " .. self.hiscore, windowWidth / 4, windowHeight - 20, windowWidth / 2, "center")
+   
+   --draw player lives
+   love.graphics.printf("Lives: x" .. self.player.class.lives, 5, 5, windowWidth / 8, "left")
 end
 
 function Gameplay:update(dt)
@@ -266,11 +271,19 @@ function Gameplay:update(dt)
       self.hiscore = Gameplay.static.score
    end
 
+   if self.player.class.wantsGhost then
+      self.collider:setGhost(self.player)
+      self.player.class.wantsGhost = false
+   elseif self.player.class.wantsHit then
+      self.collider:setSolid(self.player)
+      self.player.class.wantsHit = false
+   end
+   
    if self.player.class.isReallyDead then
       local x, y = self.player.class.worldX, self.player.class.worldY
 
       self.collider:clear()
-      currState = GameOver:new(self.background, Gameplay.static.score, self.hiscore, x, y)
+      currState = GameOver:new(self.background, Gameplay.static.score, self.hiscore, x, y, love.timer.getTime() - self.beginTime)
    end
 end
 

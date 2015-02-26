@@ -3,7 +3,7 @@ require("middleclass-commons")
 
 Bullet = class("Bullet")
 Bullet.static.image = love.graphics.newImage("media/images/lazr.png")
-Bullet.static.sound = love.sound.newSoundData("media/sound/Laser_shoot.wav")
+Bullet.static.sound = love.sound.newSoundData("media/sound/Laser_Shoot.wav")
 
 function Bullet:initialize(x, y, worldX, worldY, owner, direction, index, image, movementSpeed, movementAcceleration, sound)
    self.x = x
