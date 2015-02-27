@@ -49,7 +49,7 @@ function Player:initialize()
    self.wantsGhost = false
    self.isGhost = false
    self.wantsHit = false
-   self.ghostAlpha = 255 / 2
+   self.ghostAlpha = 0
    self.ghostCounter = 0
    self.ghostTime = 0
 
