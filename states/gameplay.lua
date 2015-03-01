@@ -3,6 +3,7 @@ require("middleclass-commons")
 
 Gameplay = class("Gameplay", State)
 Gameplay.static.score = 0
+Gameplay.static.bombs = 0
 Gameplay.static.beginGameSound = love.sound.newSoundData("media/sound/Name_Entered.wav")
 
 function Gameplay:initialize(hiscore)
@@ -32,10 +33,11 @@ function Gameplay:initialize(hiscore)
 
    self.hiscore = hiscore
    Gameplay.static.score = 0
+   Gameplay.static.bombs = mod(getSharecartData("Misc3"), MAX_BOMBS + 1)
 
    self.bossObject = nil
    self.scale = 1
-   
+
    self.beginTime = love.timer.getTime()
 
    playSound(Gameplay.beginGameSound, .3)
@@ -46,12 +48,20 @@ function Gameplay.onCollision(dt, shapeA, shapeB, mtvX, mtvY)
       shapeA.class:killMe()
       shapeB.class.marked = true
       Gameplay.static.score = Gameplay.static.score + 1
+      
+      if mod(Gameplay.score, 100) == 0 and Gameplay.bombs < MAX_BOMBS then
+         Gameplay.static.bombs = Gameplay.static.bombs + 1
+      end
    end
 
    if shapeB.class.class.super.name == "Alien" and shapeA.class.class.name == "Bullet" and not shapeB.class.isDead then
       shapeB.class:killMe()
       shapeA.class.marked = true
       Gameplay.static.score = Gameplay.static.score + 1
+      
+      if mod(Gameplay.score, 100) == 0 and Gameplay.bombs < MAX_BOMBS then
+         Gameplay.static.bombs = Gameplay.static.bombs + 1
+      end
    end
 
    if shapeA.class.class.name == "Player" and not shapeA.class.isDead and (shapeB.class.class.name == "Bullet" or (shapeB.class.class.super.name == "Alien" and not shapeB.class.isDead)) then
@@ -72,6 +82,21 @@ function Gameplay:draw()
       v:draw()
    end
 
+   love.graphics.push()
+   -- draw the HUD
+   love.graphics.setColor(255, 255, 255, 255)
+   love.graphics.setFont(TEN_FONT)
+   love.graphics.printf("Exit: ESC", windowWidth - 100, 5, 95, "right")
+   love.graphics.printf("Score: " .. Gameplay.static.score, windowWidth / 4, 5, windowWidth / 2, "center")
+   love.graphics.printf("Hi-score: " .. self.hiscore, windowWidth / 4, windowHeight - 20, windowWidth / 2, "center")
+
+   --draw player lives
+   love.graphics.printf("Lives: x" .. self.player.class.lives, 5, 5, windowWidth / 8, "left")
+
+   --draw bombs
+   love.graphics.printf("Bombs: x" .. Gameplay.bombs, 5, TEN_FONT:getHeight() + 5, windowWidth / 8, "left")
+   love.graphics.pop()
+   
    love.graphics.push()
    love.graphics.scale(self.scale)
    -- draw the enemies
@@ -109,16 +134,6 @@ function Gameplay:draw()
       end
    end
    love.graphics.pop()
-
-   -- draw the HUD
-   love.graphics.setColor(255, 255, 255, 255)
-   love.graphics.setFont(TEN_FONT)
-   love.graphics.printf("Exit: ESC", windowWidth - 100, 5, 95, "right")
-   love.graphics.printf("Score: " .. Gameplay.static.score, windowWidth / 4, 5, windowWidth / 2, "center")
-   love.graphics.printf("Hi-score: " .. self.hiscore, windowWidth / 4, windowHeight - 20, windowWidth / 2, "center")
-   
-   --draw player lives
-   love.graphics.printf("Lives: x" .. self.player.class.lives, 5, 5, windowWidth / 8, "left")
 end
 
 function Gameplay:update(dt)
@@ -278,12 +293,12 @@ function Gameplay:update(dt)
       self.collider:setSolid(self.player)
       self.player.class.wantsHit = false
    end
-   
+
    if self.player.class.isReallyDead then
       local x, y = self.player.class.worldX, self.player.class.worldY
 
       self.collider:clear()
-      currState = GameOver:new(self.background, Gameplay.static.score, self.hiscore, x, y, love.timer.getTime() - self.beginTime)
+      currState = GameOver:new(self.background, Gameplay.static.score, self.hiscore, x, y, love.timer.getTime() - self.beginTime, Gameplay.static.bombs)
    end
 end
 
@@ -296,6 +311,28 @@ function Gameplay:getItemCount(theTable, base, max)
    end
 
    return ret
+end
+
+function Gameplay:keypressed(key, isrepeat)
+   if key == "lshift" and Gameplay.static.bombs > 0 then
+      Gameplay.static.bombs = Gameplay.static.bombs - 1
+      self.enemyOverallTime = 0
+
+      -- remove everything
+      -- first, enemies
+      for i = self.enemyCounterBase, self.enemyCounter do
+         if self.enemyList[i] and self.enemyList[i].class.lives > 0 then
+            self.enemyList[i].class:killMe(true)
+         end
+      end
+
+      -- and then bullets
+      for i = self.bulletCounterBase, self.bulletCounter do
+         if self.bulletList[i] and not self.bulletList[i].class.marked then
+            self.bulletList[i].class.marked = true
+         end
+      end
+   end
 end
 
 function Gameplay:__tostring()

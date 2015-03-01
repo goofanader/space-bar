@@ -16,7 +16,7 @@ GameOver.static.messages = {
    {"We cannot win", 400, MAX_MISC}
 }
 
-function GameOver:initialize(backgrounds, score, hiscore, x, y, gameTime)
+function GameOver:initialize(backgrounds, score, hiscore, x, y, gameTime, bombs)
    State.initialize(self, "GameOver")
 
    self.background = backgrounds
@@ -37,6 +37,7 @@ function GameOver:initialize(backgrounds, score, hiscore, x, y, gameTime)
    self.x = x or 0
    self.y = y or 0
    self.gameTime = gameTime
+   self.bombs = bombs
 
    love.keyboard.setKeyRepeat(true)
    self.isTyping = true
@@ -118,9 +119,10 @@ function GameOver:keypressed(key, isrepeat)
       love.keyboard.setKeyRepeat(false)
 
       -- save scores
-      saveToSharecart("Misc0", mod(self.score, MAX_MISC))
-      saveToSharecart("Misc1", mod(self.hiscore, MAX_MISC))
-      saveToSharecart("Misc2", mod(math.ceil(self.gameTime), MAX_MISC))
+      saveToSharecart("Misc0", mod(self.score, MAX_MISC + 1))
+      saveToSharecart("Misc1", mod(self.hiscore, MAX_MISC + 1))
+      saveToSharecart("Misc2", mod(math.ceil(self.gameTime), MAX_MISC + 1))
+      saveToSharecart("Misc3", self.bombs)
       saveToSharecart("MapX", math.floor(mod(self.x, MAX_COORDINATES)))
       saveToSharecart("MapY", math.floor(mod(self.y, MAX_COORDINATES)))
 

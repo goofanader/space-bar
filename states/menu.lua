@@ -56,8 +56,13 @@ function Menu:draw()
    love.graphics.setFont(TWENTY_FONT)
    love.graphics.printf("to Start", windowWidth / 4, windowHeight / 8 * 5, windowWidth / 2, "center")
    
-   love.graphics.draw(Menu.arrowsImage, windowWidth / 8 - (Menu.arrowsImage:getWidth() / 2), windowHeight / 8)
-   love.graphics.printf("to Move", windowWidth / 16, windowHeight / 8 * 5, windowWidth / 8, "center")
+   love.graphics.draw(Menu.arrowsImage, windowWidth / 10 - (Menu.arrowsImage:getWidth() / 2), windowHeight / 8)
+   love.graphics.printf("to Move", windowWidth / 10 - (Menu.arrowsImage:getWidth() / 2), windowHeight / 8 * 5, Menu.arrowsImage:getWidth(), "center")
+   
+   local lshiftX = ((windowWidth / 2 - (Menu.titleImage:getWidth() / 2)) + (windowWidth / 10 + windowHeight / 2)) / 2
+   
+   love.graphics.printf("LSHIFT", lshiftX - (TWENTY_FONT:getWidth("LSHIFT") / 2), windowHeight / 8 * 3, TWENTY_FONT:getWidth("LSHIFT"), "center")
+   love.graphics.printf("use bomb", lshiftX - (TWENTY_FONT:getWidth("use bomb") / 2), windowHeight / 8 * 5, TWENTY_FONT:getWidth("use bomb"), "right")
    
    love.graphics.printf("Destroy", windowWidth / 16 * 12, windowHeight / 8 * 5, windowWidth / 7, "center")
 end

@@ -9,20 +9,20 @@ Alien.static.deathSound = love.sound.newSoundData("media/sound/Explosion.wav")
 function Alien:initialize(name, image, x, y, width, height, animationSpeed)
    self.name = name
    self.image = image
-   
+
    self.x = x
    self.y = y
-   
+
    self.width = width
    self.height = height
-   
+
    self.scale = SCALE
    self.marked = false
-   
+
    self.animGrid = anim8.newGrid(width, height, image:getWidth(), image:getHeight())
    animationSpeed = not animationSpeed and 6 / FRAME_RATE or animationSpeed
    self.mainAnimation = anim8.newAnimation(self.animGrid('1-2', 1), animationSpeed)
-   
+
    self.deathAnimation = anim8.newAnimation(self.animGrid('1-2',1), 1 / FRAME_RATE, function(instance)
          if instance.classObject.deathLoops >= 2 then
             instance.classObject.marked = true
@@ -36,10 +36,10 @@ function Alien:initialize(name, image, x, y, width, height, animationSpeed)
    self.deathAnimation.classObject = self
    self.deathLoops = 0
    self.isDead = false
-   
+
    self.animation = self.mainAnimation
    self.lives = 1
-   
+
    self.deathSound = Alien.deathSound
    self.deathSoundVolume = .1
 end
@@ -52,17 +52,21 @@ function Alien:update(dt)
    self.animation:update(dt)
 end
 
-function Alien:killMe()
-   self.lives = self.lives - 1
-   
+function Alien:killMe(shouldReallyDie)
+   if not shouldReallyDie then
+      self.lives = self.lives - 1
+   else
+      self.lives = 0
+   end
+
    if self.lives <= 0 then
       self.animation = self.deathAnimation
       self.image = self.deathImage
       self.isDead = true
-      
+
       playSound(self.deathSound, self.deathSoundVolume)
    end
-   
+
    return true
 end
 

@@ -45,7 +45,7 @@ function Player:initialize()
 
    self.animation = self.mainAnimation
 
-   self.lives = getSharecartData("Switch0") and mod(getSharecartData("Misc2"), MAX_LIVES) or 1
+   self.lives = getSharecartData("Switch0") and mod(getSharecartData("Misc2"), MAX_LIVES + 1) or 1
    self.wantsGhost = false
    self.isGhost = false
    self.wantsHit = false
