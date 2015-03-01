@@ -10,7 +10,7 @@ Player.static.deathSound = love.sound.newSoundData("media/sound/Player_Death.wav
 Player.static.gotHit = love.sound.newSoundData("media/sound/Hit_Hurt4.wav")
 
 function Player:initialize()
-   self.image = Player.static.guyImage
+   self.image = getSharecartData("Switch2") and Player.static.shipImage or Player.static.guyImage
 
    self.x = 0
    self.y = windowHeight / 2 - (self.image:getHeight() / 2)
