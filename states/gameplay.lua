@@ -4,6 +4,8 @@ require("middleclass-commons")
 Gameplay = class("Gameplay", State)
 Gameplay.static.score = 0
 Gameplay.static.bombs = 0
+Gameplay.static.bombPoints = 0
+Gameplay.static.gainedBomb = false
 Gameplay.static.beginGameSound = love.sound.newSoundData("media/sound/Name_Entered.wav")
 
 function Gameplay:initialize(hiscore)
@@ -34,6 +36,9 @@ function Gameplay:initialize(hiscore)
    self.hiscore = hiscore
    Gameplay.static.score = 0
    Gameplay.static.bombs = mod(getSharecartData("Misc3"), MAX_BOMBS + 1)
+   self.bombCounter = 0
+   self.bombAlpha = 255 / 2
+   self.bombTime = 0
 
    self.bossObject = nil
    self.scale = 1
@@ -48,9 +53,12 @@ function Gameplay.onCollision(dt, shapeA, shapeB, mtvX, mtvY)
       shapeA.class:killMe()
       shapeB.class.marked = true
       Gameplay.static.score = Gameplay.static.score + 1
-      
-      if mod(Gameplay.score, 100) == 0 and Gameplay.bombs < MAX_BOMBS then
+      Gameplay.static.bombPoints = Gameplay.bombPoints + 1
+
+      if Gameplay.bombPoints >= GET_BOMB_POINTS and Gameplay.bombs < MAX_BOMBS then
          Gameplay.static.bombs = Gameplay.static.bombs + 1
+         Gameplay.static.gainedBomb = true
+         Gameplay.static.bombPoints = 0
       end
    end
 
@@ -58,9 +66,12 @@ function Gameplay.onCollision(dt, shapeA, shapeB, mtvX, mtvY)
       shapeB.class:killMe()
       shapeA.class.marked = true
       Gameplay.static.score = Gameplay.static.score + 1
-      
-      if mod(Gameplay.score, 100) == 0 and Gameplay.bombs < MAX_BOMBS then
+      Gameplay.static.bombPoints = Gameplay.bombPoints + 1
+
+      if Gameplay.bombPoints >= GET_BOMB_POINTS and Gameplay.bombs < MAX_BOMBS then
          Gameplay.static.bombs = Gameplay.static.bombs + 1
+         Gameplay.static.gainedBomb = true
+         Gameplay.static.bombPoints = 0
       end
    end
 
@@ -96,7 +107,7 @@ function Gameplay:draw()
    --draw bombs
    love.graphics.printf("Bombs: x" .. Gameplay.bombs, 5, TEN_FONT:getHeight() + 5, windowWidth / 8, "left")
    love.graphics.pop()
-   
+
    love.graphics.push()
    love.graphics.scale(self.scale)
    -- draw the enemies
@@ -114,6 +125,15 @@ function Gameplay:draw()
 
    -- draw the player
    self.player.class:draw()
+
+   if Gameplay.static.gainedBomb then
+      --draw the text
+      local r,g,b,a = love.graphics.getColor()
+      love.graphics.setColor(0, 255, 0, self.bombAlpha)
+      love.graphics.setFont(TEN_FONT)
+      love.graphics.printf("+bomb", self.player.class.x + self.player.class.width * self.player.class.scale + 5, self.player.class.y, TEN_FONT:getWidth("+bomb"), "left")
+      love.graphics.setColor(r,g,b,a)
+   end
 
    if drawHitboxes then
       love.graphics.setColor(255,0,0, 155)
@@ -140,6 +160,23 @@ function Gameplay:update(dt)
    --update the background
    for i,v in ipairs(self.background) do
       v:update(dt)
+   end
+
+   -- update the bomb message if need be
+   if Gameplay.static.gainedBomb then
+      self.bombTime = self.bombTime + dt
+
+      if self.bombTime > .5 then
+         self.bombTime = 0
+         self.bombCounter = self.bombCounter + 1
+         self.bombAlpha = self.bombAlpha == 255 and 255 / 2 or 255
+
+         if self.bombCounter > 3 then
+            Gameplay.static.gainedBomb = false
+            self.bombCounter = 0
+            self.bombAlpha = 255 / 2
+         end
+      end
    end
 
    -- update the bullets
