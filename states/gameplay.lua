@@ -260,12 +260,12 @@ function Gameplay:update(dt)
    local enemyChance = 65
    local bigEnemyChance = 85
    local bossChance = 98
-   local maxEnemies = 100--3
+   local maxEnemies = 10
    local enemyTime = randomGenerator:random(7,15) * .1
    self.enemyOverallTime = self.enemyOverallTime + dt
 
    if not self.isBossFight then
-      if randomGenerator:random(1, 100) > bossChance and self.enemyOverallTime > enemyTime then
+      if randomGenerator:random(1, 100) > bossChance and self.enemyOverallTime > enemyTime and self:getItemCount(self.enemyList, self.enemyCounterBase, self.enemyCounter) < maxEnemies then
          local newAlien = BossAlien:new()
          self.enemyList[self.enemyCounter] = self.collider:addRectangle(newAlien.x, newAlien.y, newAlien.width * newAlien.scale, newAlien.height * newAlien.scale)
          self.enemyList[self.enemyCounter].class = newAlien
@@ -282,9 +282,10 @@ function Gameplay:update(dt)
    else
       enemyChance = 35
       enemyTime = randomGenerator:random(5,10) * .1
+      maxEnemies = 15
    end
 
-   if randomGenerator:random(1,100) > bigEnemyChance and self.enemyOverallTime > enemyTime then
+   if randomGenerator:random(1,100) > bigEnemyChance and self.enemyOverallTime > enemyTime and self:getItemCount(self.enemyList, self.enemyCounterBase, self.enemyCounter) < maxEnemies then
       local newAlien = MediumAlien:new()
       self.enemyList[self.enemyCounter] = self.collider:addRectangle(newAlien.x, newAlien.y, newAlien.width * newAlien.scale, newAlien.height * newAlien.scale)
       self.enemyList[self.enemyCounter].class = newAlien
@@ -296,7 +297,7 @@ function Gameplay:update(dt)
       self.enemyOverallTime = self.enemyOverallTime - enemyTime / 8 * 7
    end
 
-   if randomGenerator:random(1,100) > enemyChance and --[[self:getItemCount(self.enemyList, self.enemyCounterBase, self.enemyCounter) < maxEnemies and]] self.enemyOverallTime > enemyTime then
+   if randomGenerator:random(1,100) > enemyChance and self:getItemCount(self.enemyList, self.enemyCounterBase, self.enemyCounter) < maxEnemies and self.enemyOverallTime > enemyTime then
       local newAlien = EasyAlien:new()
       self.enemyList[self.enemyCounter] = self.collider:addRectangle(newAlien.x, newAlien.y, newAlien.width * newAlien.scale, newAlien.height * newAlien.scale)
       self.enemyList[self.enemyCounter].class = newAlien

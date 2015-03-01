@@ -57,7 +57,7 @@ function createSaveFile()
       iniFileObject:write("Misc0=0\n")
       iniFileObject:write("Misc1=0\n")
       iniFileObject:write("Misc2=0\n")
-      iniFileObject:write("Misc3=0\n")
+      iniFileObject:write("Misc3=3\n")
       iniFileObject:write("PlayerName=Player\n")
 
       for i = 0, MAX_SWITCHES do
