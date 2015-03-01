@@ -41,6 +41,12 @@ function GameOver:initialize(backgrounds, score, hiscore, x, y, gameTime, bombs)
 
    love.keyboard.setKeyRepeat(true)
    self.isTyping = true
+   
+   -- set screen back to center
+   local width, height, flags = love.window.getMode()
+   flags.x = initWinX
+   flags.y = initWinY
+   love.window.setMode(width, height, flags)
 end
 
 function GameOver:update(dt)
@@ -51,22 +57,42 @@ function GameOver:update(dt)
    --update the background
    --[[for i,v in ipairs(self.background) do
       v:update(dt)
-   end]]
-self.overallTime = self.overallTime + dt
+   efnd]]
+   self.overallTime = self.overallTime + dt
 
-if self.overallTime > .5 then
-   self.overallTime = 0
+   if self.overallTime > .5 then
+      self.overallTime = 0
 
-   if self.isTyping then
-      if self.cursor == " " then
-         self.cursor = "_"
+      if self.isTyping then
+         if self.cursor == " " then
+            self.cursor = "_"
+         else
+            self.cursor = " "
+         end
       else
          self.cursor = " "
       end
-   else
-      self.cursor = " "
    end
-end
+   
+   -- set the screen to center
+   --[[local winX, winY, flags = love.window.getMode()
+   if flags.x ~= initWinX then
+      if flags.x - initWinX < 0 then
+         flags.x = flags.x + 1
+      else
+         flags.x = flags.x - 1
+      end
+   end
+
+   if flags.y ~= initWinY then
+      if flags.y - initWinY < 0 then
+         flags.y = flags.y + 1
+      else
+         flags.y = flags.y - 1
+      end
+   end
+
+   love.window.setMode(winX, winY, flags)]]
 end
 
 function GameOver:getMessageString()
@@ -75,7 +101,7 @@ function GameOver:getMessageString()
          return "\"" .. messageList[1] .. "\""
       end
    end
-   
+
    return "\"" .. GameOver.messages[#GameOver.messages][1] .. "\""
 end
 

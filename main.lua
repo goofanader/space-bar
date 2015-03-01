@@ -180,7 +180,11 @@ function love.load()
    --overallTime = 0
 
    love.graphics.setDefaultFilter("nearest")
-   windowWidth, windowHeight = love.graphics.getDimensions()
+   local width, height, flags = love.window.getMode()
+   windowWidth = width
+   windowHeight = height
+   initWinX = flags.x
+   initWinY = flags.y
 
    require("constants")
 

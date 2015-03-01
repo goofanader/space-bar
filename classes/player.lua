@@ -56,6 +56,14 @@ function Player:initialize()
    if self.lives == 0 then
       self.lives = 1
    end
+
+   self.screenShakeTime = MAX_GHOST_TIME / 4
+   self.screenShakeDirection = 1
+   self.isScreenShaking = false
+
+   local winX, winY, flags = love.window.getMode()
+   self.initWinX = initWinX
+   self.initWinY = initWinY
 end
 
 function Player:draw()
@@ -67,7 +75,7 @@ function Player:draw()
    end
 
    self.animation:draw(self.image, self.x, self.y, 0, self.scale, self.scale)
-   
+
    love.graphics.setColor(r,g,b,a)
 end
 
@@ -82,12 +90,12 @@ function Player:update(dt)
 
       --update movement via keyboard presses
       local keysDown = keyPressQueue:getRepeats()
-      
+
       --[[for k,v in pairs(keysDown) do
          print(k,v)
       end
       print("===")]]
-      
+
       if keysDown["up"] then
          self.y = self.y - MOVEMENT
       end
@@ -132,18 +140,82 @@ function Player:update(dt)
 
       if self.isGhost then
          self.ghostTime = self.ghostTime + dt
+         self.screenShakeTime = self.screenShakeTime + dt
 
-         if self.ghostTime > .2 then
+         if self.isScreenShaking then
+            local winX, winY, flags = love.window.getMode()
+
+            if randomGenerator:random() < .5 then
+               flags.x = flags.x + 1 * self.screenShakeDirection
+            else
+               flags.y = flags.y + 1 * self.screenShakeDirection
+            end
+            --flags.y
+            love.window.setMode(winX, winY, flags)
+
+            if self.screenShakeTime > MAX_GHOST_TIME / (self.ghostCounter + .5) then
+               self.screenShakeDirection = self.screenShakeDirection * -1
+               self.screenShakeTime = 0
+            end
+         end
+
+         if self.ghostTime > MAX_GHOST_TIME then
             self.ghostTime = 0
             self.ghostAlpha = self.ghostAlpha == 255 and 0 or 255
             self.ghostCounter = self.ghostCounter + 1
-            
+
+            if self.ghostCounter > 3 then
+               self.isScreenShaking = false
+
+               --[[flags.centered = true
+               --love.window.setMode(winX, winY, flags)
+               flags.x = self.initWinX
+               flags.y = self.initWinY
+               love.window.setMode(winX, winY, flags)]]
+               self.screenShakeDirection = 1
+            end
+
             if self.ghostCounter > 7 then
                self.ghostCounter = 0
                self.isGhost = false
                self.wantsHit = true
             end
          end
+      end
+
+      if not self.isScreenShaking then
+         local winX, winY, flags = love.window.getMode()
+         if flags.x ~= self.initWinX then
+            if flags.x - self.initWinX < 0 then
+               flags.x = flags.x + 1
+            else
+               flags.x = flags.x - 1
+            end
+         end
+
+         if flags.y ~= self.initWinY then
+            if flags.y - self.initWinY < 0 then
+               flags.y = flags.y + 1
+            else
+               flags.y = flags.y - 1
+            end
+         end
+
+         love.window.setMode(winX, winY, flags)
+      end
+   else
+      self.screenShakeTime = self.screenShakeTime + dt
+
+      local winX, winY, flags = love.window.getMode()
+      flags.x = flags.x + 1 * self.screenShakeDirection
+      --flags.y
+      love.window.setMode(winX, winY, flags)
+
+      if self.screenShakeTime > .1--[[MAX_GHOST_TIME / (self.ghostCounter + 1)]] then
+         self.screenShakeDirection = self.screenShakeDirection * -1
+         self.screenShakeTime = 0
+
+         self.ghostCounter = self.ghostCounter + MAX_GHOST_TIME
       end
    end
 end
@@ -162,8 +234,13 @@ function Player:killMe()
       else
          self.wantsGhost = true
          self.isGhost = true
-         
+         self.isScreenShaking = true
+
          playSound(Player.gotHit, .2)
+
+         local winX, winY, flags = love.window.getMode()
+         --flags.centered = false
+         love.window.setMode(winX, winY, flags)
       end
    end
 
