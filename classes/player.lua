@@ -96,21 +96,19 @@ function Player:update(dt)
       end
       print("===")]]
 
-      if keysDown["up"] then
+      if --[[keysDown["up"]] love.keyboard.isDown("up") then
          self.y = self.y - MOVEMENT
-      end
-      if keysDown["down"] then
+      elseif --[[keysDown["down"]] love.keyboard.isDown("down") then
          self.y = self.y + MOVEMENT
       end
 
-      if keysDown["left"] then
+      if --[[keysDown["left"]] love.keyboard.isDown("left") then
          self.x = self.x - MOVEMENT
-      end
-      if keysDown["right"] then
+      elseif --[[keysDown["right"]] love.keyboard.isDown("right") then
          self.x = self.x + MOVEMENT
       end
 
-      if keysDown["space"] and self.bulletTime > BULLET_TIME then
+      if --[[keysDown["space"]] love.keyboard.isDown("space") and self.bulletTime > BULLET_TIME then
          -- pew pew lasers
          --[[addToBulletList(self.x + self.image:getWidth(), self.y, self.worldX + self.image:getWidth(), self.worldY, "Player", 1)]]
          self.wantBullet = true

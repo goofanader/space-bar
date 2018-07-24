@@ -222,6 +222,7 @@ function love.load()
    end
 
    currState = Menu:new()--Gameplay:new()
+   love.keyboard.setKeyRepeat(true)
 
    music = love.audio.newSource("media/sound/spacemusic.wav", "stream")
    music:setLooping(true)
