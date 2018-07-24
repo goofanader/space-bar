@@ -95,7 +95,7 @@ function Gameplay:draw()
 
    love.graphics.push()
    -- draw the HUD
-   love.graphics.setColor(255, 255, 255, 255)
+   love.graphics.setColor(1, 1, 1, 1)
    love.graphics.setFont(TEN_FONT)
    love.graphics.printf("Exit: ESC", windowWidth - 100, 5, 95, "right")
    love.graphics.printf("Score: " .. Gameplay.static.score, windowWidth / 4, 5, windowWidth / 2, "center")
@@ -116,9 +116,9 @@ function Gameplay:draw()
          self.enemyList[i].class:draw()
 
          if drawHitboxes then
-            love.graphics.setColor(0,255,255, 155)
+            love.graphics.setColor(0,1,1, 1)
             self.enemyList[i]:draw("fill")
-            love.graphics.setColor(255,255,255,255)
+            love.graphics.setColor(1,1,1,1)
          end
       end
    end
@@ -129,16 +129,16 @@ function Gameplay:draw()
    if Gameplay.static.gainedBomb then
       --draw the text
       local r,g,b,a = love.graphics.getColor()
-      love.graphics.setColor(0, 255, 0, self.bombAlpha)
+      love.graphics.setColor(0, 1, 0, self.bombAlpha/255)
       love.graphics.setFont(TEN_FONT)
       love.graphics.printf("+bomb", self.player.class.x + self.player.class.width * self.player.class.scale + 5, self.player.class.y, TEN_FONT:getWidth("+bomb"), "left")
       love.graphics.setColor(r,g,b,a)
    end
 
    if drawHitboxes then
-      love.graphics.setColor(255,0,0, 155)
+      love.graphics.setColor(1,0,0, 155/255)
       self.player:draw("fill")
-      love.graphics.setColor(255,255,255,255)
+      love.graphics.setColor(1,1,1,1)
    end
 
    -- draw each bullet
@@ -147,9 +147,9 @@ function Gameplay:draw()
          self.bulletList[i].class:draw()
 
          if drawHitboxes then
-            love.graphics.setColor(255,255,0, 155)
+            love.graphics.setColor(1,1,0, 155/255)
             self.bulletList[i]:draw("fill")
-            love.graphics.setColor(255,255,255,255)
+            love.graphics.setColor(1,1,1,1)
          end
       end
    end

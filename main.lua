@@ -16,13 +16,17 @@ function getSharecartDat()
       slashes = "\\"
    end
 
-   for i = 2, #directorySplit - 1 do
-      if osname == "OS X" and love.filesystem.isFused() and directorySplit[i]:find("%.app") then
-         break
-      end
+   if osname == "OS X" and love.filesystem.isFused() then
+       for i = 2, #directorySplit - 1 do
+          if osname == "OS X" and love.filesystem.isFused() and directorySplit[i]:find("%.app") then
+             break
+          end
 
-      iniFileString = iniFileString .. slashes .. directorySplit[i]
-   end
+          iniFileString = iniFileString .. slashes .. directorySplit[i]
+      end
+  else
+      iniFileString = userDirectory
+  end
 
    local datFolder = iniFileString .. slashes .. "dat"
 
@@ -76,7 +80,7 @@ function reloadSharecartData()
 end
 
 function checkSharecartData()
-   local sharecartData 
+   local sharecartData
    if not pcall(function()
          sharecartData = sharecart.love_load(love, arg)
       end
@@ -206,7 +210,7 @@ function love.load()
       ["right"] = true,
       ["up"] = true,
       ["down"] = true,
-      [" "] = true,
+      ["space"] = true,
       ["lshift"] = true--bomb key
    }
 
@@ -219,7 +223,7 @@ function love.load()
 
    currState = Menu:new()--Gameplay:new()
 
-   music = love.audio.newSource("media/sound/spacemusic.wav")
+   music = love.audio.newSource("media/sound/spacemusic.wav", "stream")
    music:setLooping(true)
    music:play()
 end
@@ -235,7 +239,7 @@ function love.draw()
    currState:draw()
 end
 
-function love.keypressed(key, isrepeat)
+function love.keypressed(key, scancode, isrepeat)
    if key == "escape" then
       love.event.quit()
    end

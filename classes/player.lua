@@ -69,9 +69,9 @@ end
 function Player:draw()
    local r,g,b,a = love.graphics.getColor()
    if not self.isGhost then
-      love.graphics.setColor(255, 255, 255, 255)
+      love.graphics.setColor(1, 1, 1, 1)
    else
-      love.graphics.setColor(255, 255, 255, self.ghostAlpha)
+      love.graphics.setColor(1, 1, 1, self.ghostAlpha)
    end
 
    self.animation:draw(self.image, self.x, self.y, 0, self.scale, self.scale)
@@ -110,7 +110,7 @@ function Player:update(dt)
          self.x = self.x + MOVEMENT
       end
 
-      if keysDown[" "] and self.bulletTime > BULLET_TIME then
+      if keysDown["space"] and self.bulletTime > BULLET_TIME then
          -- pew pew lasers
          --[[addToBulletList(self.x + self.image:getWidth(), self.y, self.worldX + self.image:getWidth(), self.worldY, "Player", 1)]]
          self.wantBullet = true
@@ -131,7 +131,7 @@ function Player:update(dt)
       end
 
       if self.y < 0 or self.y > windowHeight - self.height * self.scale then
-         --print(love.keyboard.isDown("up") and love.keyboard.isDown("left") and love.keyboard.isDown(" "))
+         --print(love.keyboard.isDown("up") and love.keyboard.isDown("left") and love.keyboard.isDown("space"))
          self.y = prevY
          self.worldY = self.y
       end

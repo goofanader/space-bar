@@ -195,6 +195,8 @@ sharecart.love_load = function (love, load_args)
   else
     -- otherwise whatever is passed as the first argument should work
     cwd = load_args[1]
+    -- remove a slash at the end of the directory path
+    if cwd:sub(#cwd) == "/" then cwd = cwd:sub(1, #cwd-1) end
   end
 
   if not sharecart.valid(cwd) then

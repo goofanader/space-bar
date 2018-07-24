@@ -41,7 +41,7 @@ function GameOver:initialize(backgrounds, score, hiscore, x, y, gameTime, bombs)
 
    love.keyboard.setKeyRepeat(true)
    self.isTyping = true
-   
+
    -- set screen back to center
    local width, height, flags = love.window.getMode()
    flags.x = initWinX
@@ -50,7 +50,7 @@ function GameOver:initialize(backgrounds, score, hiscore, x, y, gameTime, bombs)
 end
 
 function GameOver:update(dt)
-   if love.keyboard.isDown(" ") and not self.isTyping then
+   if love.keyboard.isDown("space") and not self.isTyping then
       currState = Gameplay:new()
    end
 
@@ -73,7 +73,7 @@ function GameOver:update(dt)
          self.cursor = " "
       end
    end
-   
+
    -- set the screen to center
    --[[local winX, winY, flags = love.window.getMode()
    if flags.x ~= initWinX then
@@ -111,12 +111,12 @@ function GameOver:draw()
       v:draw()
    end
 
-   love.graphics.setColor(4, 174, 204, 255)
+   love.graphics.setColor(4/255, 174/255, 204/255, 255/255)
    love.graphics.setFont(FIFTY_FONT)
    local mainString = (self.isTyping or self.score < 50) and "GAME OVER" or self:getMessageString():upper()
    love.graphics.printf(mainString, 5, windowHeight / 8, windowWidth - 5, "center")
 
-   love.graphics.setColor(255, 255, 255, 255)
+   love.graphics.setColor(255/255, 255/255, 255/255, 255/255)
    love.graphics.setFont(TEN_FONT)
    love.graphics.printf("Exit: ESC", windowWidth - 100, 5, 95, "right")
    love.graphics.printf("Score: " .. self.score, windowWidth / 4, 5, windowWidth / 2, "center")
@@ -131,7 +131,7 @@ function GameOver:draw()
 end
 
 function GameOver:keypressed(key, isrepeat)
-   if key == " " and not self.isTyping then
+   if key == "space" and not self.isTyping then
       currState = Gameplay:new(self.hiscore)
    end
 
